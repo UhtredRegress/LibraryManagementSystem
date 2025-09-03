@@ -1,3 +1,5 @@
+namespace LMS.Data;
+
 public class User
 {
     public int Id { get; set; }
@@ -8,5 +10,5 @@ public class User
     public string PhoneNumber { get; set; }
     public string Address { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime ModifiedAt { get; set; } 
+    public DateTime ModifiedAt { get; set; }
 }
