@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Data", "LMS.Data\LMS.Data.csproj", "{C2A277BA-30F7-4FD9-95DD-ED763955508F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.API", "LMS.API\LMS.API.csproj", "{679664F3-E996-48DF-91C7-BAB5C97612D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{C2A277BA-30F7-4FD9-95DD-ED763955508F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2A277BA-30F7-4FD9-95DD-ED763955508F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2A277BA-30F7-4FD9-95DD-ED763955508F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
