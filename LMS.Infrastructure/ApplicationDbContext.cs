@@ -1,6 +1,7 @@
+using LMS.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace LMS.Data;
+namespace LMS.Infrastructure;
 
 public class ApplicationDbContext : DbContext
 {

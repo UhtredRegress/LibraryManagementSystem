@@ -1,8 +1,9 @@
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace LMS.Data;
+namespace LMS.Domain.Model;
 
 public class User
 {
