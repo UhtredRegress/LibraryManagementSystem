@@ -2,6 +2,7 @@ using FluentValidation;
 using LMS.Business;
 using LMS.Infrastructure;
 using LMS.Business.Commands;
+using LMS.Business.Validator;
 using LMS.Infrastructure.Interface;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -2,7 +2,7 @@ using FluentValidation;
 using LMS.Infrastructure.Interface;
 using LMS.Shared.DTOs;
 
-namespace LMS.Business;
+namespace LMS.Business.Validator;
 
 public class RoleDTOValidator : AbstractValidator<RoleDTO>
 {
