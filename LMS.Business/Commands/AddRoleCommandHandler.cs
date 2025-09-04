@@ -5,7 +5,7 @@ using MediatR;
 
 namespace LMS.Business.Commands;
 
-public record AddRoleCommand(RoleDTO roleDTO) : IRequest<Role>;
+public record AddRoleCommand(RoleDTO RoleDTO) : IRequest<Role>;
 
 public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, Role>
 {
@@ -19,8 +19,10 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, Role>
     {
         
         var mappingRole = new Role();
-        mappingRole.Title = request.roleDTO.Title;
+        mappingRole.Title = request.RoleDTO.Title;
         mappingRole.Id = await GenerateRoleId();
+        mappingRole.CreatedAt = DateTime.UtcNow;
+        mappingRole.ModifiedAt = DateTime.UtcNow;
 
         return await _roleRepo.AddRoleAsync(mappingRole);
     }
