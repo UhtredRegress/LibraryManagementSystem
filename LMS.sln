@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Data", "LMS.Data\LMS.Data.csproj", "{C2A277BA-30F7-4FD9-95DD-ED763955508F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Infrastructure", "LMS.Infrastructure\LMS.Infrastructure.csproj", "{C2A277BA-30F7-4FD9-95DD-ED763955508F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.API", "LMS.API\LMS.API.csproj", "{679664F3-E996-48DF-91C7-BAB5C97612D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Business", "LMS.Business\LMS.Business.csproj", "{AF66CA6C-BFFA-4A61-A0EA-24BDFC57E5E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Shared", "LMS.Shared\LMS.Shared.csproj", "{3F32AED7-CA40-47C4-8259-D3CCF946A17B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.Domain", "LMS.Domain\LMS.Domain.csproj", "{F496A5CB-48D8-4958-9373-114CC02EB83A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +30,17 @@ Global
 		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{679664F3-E996-48DF-91C7-BAB5C97612D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF66CA6C-BFFA-4A61-A0EA-24BDFC57E5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF66CA6C-BFFA-4A61-A0EA-24BDFC57E5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF66CA6C-BFFA-4A61-A0EA-24BDFC57E5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF66CA6C-BFFA-4A61-A0EA-24BDFC57E5E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F32AED7-CA40-47C4-8259-D3CCF946A17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F32AED7-CA40-47C4-8259-D3CCF946A17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F32AED7-CA40-47C4-8259-D3CCF946A17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F32AED7-CA40-47C4-8259-D3CCF946A17B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F496A5CB-48D8-4958-9373-114CC02EB83A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F496A5CB-48D8-4958-9373-114CC02EB83A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F496A5CB-48D8-4958-9373-114CC02EB83A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F496A5CB-48D8-4958-9373-114CC02EB83A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
