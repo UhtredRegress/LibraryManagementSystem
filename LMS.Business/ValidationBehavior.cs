@@ -19,7 +19,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             var context = new ValidationContext<TRequest>(request);
             var validationResult = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
             
-            var failures = validationResult.SelectMany(r => r.Errors).Where(f => f != null).ToList();
+            var failures = validationResult.Where(f => !f.IsValid).SelectMany(f => f.Errors).ToList();
 
             if (failures.Count != 0)
                 throw new ValidationException(failures);
