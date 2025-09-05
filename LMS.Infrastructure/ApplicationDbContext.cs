@@ -11,6 +11,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Book> Books { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,5 +24,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Role>()
             .HasIndex(r => r.Title)
             .IsUnique();
+
+        modelBuilder.Entity<Book>(entity =>
+            entity.Property(b => b.PublishDate).HasColumnType("date")
+        );
     }
 }
