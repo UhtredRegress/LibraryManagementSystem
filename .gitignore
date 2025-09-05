@@ -55,5 +55,5 @@ TestResult.xml
 nunit-*.xml
 
 *.DotSettings.user
-
+*.sln.DotSettings.user
 

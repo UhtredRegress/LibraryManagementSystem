@@ -5,7 +5,7 @@ using LMS.Shared.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LMS.API;
+namespace LMS.API.Controllers;
 
 [ApiController]
 [Route("api/users")]
