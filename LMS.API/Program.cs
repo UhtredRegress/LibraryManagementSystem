@@ -1,6 +1,7 @@
 using System.Text;
 using FluentValidation;
 using LMS.Business;
+using LMS.Business.IService;
 using LMS.Infrastructure;
 using LMS.Infrastructure.Interface;
 using MediatR;
@@ -23,6 +24,8 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(LMS.Business.Assembl
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IBookService, BookService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
