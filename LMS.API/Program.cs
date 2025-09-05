@@ -1,7 +1,6 @@
 using FluentValidation;
 using LMS.Business;
 using LMS.Infrastructure;
-using LMS.Business.Commands;
 using LMS.Business.Validator;
 using LMS.Infrastructure.Interface;
 using MediatR;
@@ -17,11 +16,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer(); // Needed for minimal APIs too
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<AddRoleCommand>());
-builder.Services.AddValidatorsFromAssemblyContaining<AddRoleCommandValidator>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LMS.Business.AssemblyMarker).Assembly));
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(LMS.Business.AssemblyMarker));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
         
