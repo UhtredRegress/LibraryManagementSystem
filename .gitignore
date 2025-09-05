@@ -54,4 +54,6 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
+*.DotSettings.user
+
 
