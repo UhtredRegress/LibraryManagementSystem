@@ -57,3 +57,4 @@ nunit-*.xml
 *.DotSettings.user
 *.sln.DotSettings.user
 
+.env

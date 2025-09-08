@@ -1,0 +1,21 @@
+﻿services:
+  user-service:
+    build: 
+      context: .
+      dockerfile: LMS.UserService.Presentation/Dockerfile
+    container_name: user-service
+    ports:
+      - "5001:5078"
+    platform: linux/amd64
+    environment:
+      - Jwt__Key=${JWT_KEY}
+
+  
+  book-service:
+    build:
+      context: .
+      dockerfile: LMS.BookService.Presentation/Dockerfile
+    container_name: book-service
+    ports:
+      - "5002:5079"
+    platform: linux/amd64
