@@ -16,6 +16,7 @@ public class Book
     [Required]
     [Column("availabily")]
     public Availability Availability { get; set; }
+    public ICollection<Loan> Loans { get; set; } = new List<Loan>();
     public string Publisher { get; set; }
     [Column("description")]
     public string? Description { get; set; }

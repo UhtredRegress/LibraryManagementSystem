@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Infrastructure;
 
-public class RoleRepository : IRoleRepository
+public class    RoleRepository : IRoleRepository
 {
     private readonly ApplicationDbContext _dbContext;
 

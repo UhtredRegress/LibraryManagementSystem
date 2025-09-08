@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "Library.Grpc";
+
+// Request message
+message LoanBookRequest {
+  int32 user_id = 1;
+  int32 book_id = 2;
+}
+
+// Response message
+message LoanBookResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// gRPC service
+service BookLoanService {
+  rpc LoanBook (LoanBookRequest) returns (LoanBookResponse);
+}

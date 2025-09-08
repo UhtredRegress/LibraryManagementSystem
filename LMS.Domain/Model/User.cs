@@ -25,6 +25,7 @@ public class User
     [Column("phone_number")]
     [RegularExpression(@"^0\d{9}$", ErrorMessage = "Invalid Phone Number")]
     public string PhoneNumber { get; set; }
+    public ICollection<Loan> Loans { get; set; } = new List<Loan>();
     [Required]
     [Column("address")]
     public string Address { get; set; }
@@ -34,4 +35,6 @@ public class User
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
+
+    
 }
