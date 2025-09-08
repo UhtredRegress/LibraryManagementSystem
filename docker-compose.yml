@@ -19,3 +19,20 @@
     ports:
       - "5002:5079"
     platform: linux/amd64
+
+
+  postgres-service:
+    image: postgres:16
+    container_name: postgres-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
