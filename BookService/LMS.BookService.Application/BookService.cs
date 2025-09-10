@@ -1,8 +1,10 @@
+using LMS.BookService.Application.IService;
 using LMS.BookService.Domain.Enum;
 using LMS.BookService.Domain.Model;
-using LMS.BookService.Domain.IService;
+using LMS.BookService.Infrastructure.Interface;
+using LMS.Shared.Exception;
 
-namespace LMS.BookService.Domain;
+namespace LMS.BookService.Application;
 
 public class BookService : IBookService
 {
@@ -16,10 +18,10 @@ public class BookService : IBookService
 
     public async Task<Book> AddBookAsync(Book book)
     {
-        book.CreatedAt = DateTime.UtcNow;
-        book.ModifiedAt = DateTime.UtcNow;
-        book.Availability = Availability.Available;
-        return await _bookRepository.AddBookAsync(book);
+        Book addedBook = new Book(book.Title, book.Author, book.Availability, book.PublishDate, book.Description,
+            book.Description);
+        
+        return await _bookRepository.AddBookAsync(addedBook);
     }
 
     public async Task<Book> UpdateBookAsync(int id, Book book)
@@ -30,13 +32,8 @@ public class BookService : IBookService
         {
             throw new NotFoundDataException("The book does not exist");
         }
-        
-        foundBook.Author = book.Author;
-        foundBook.Title = book.Title; 
-        foundBook.Publisher = book.Publisher; 
-        foundBook.CreatedAt = DateTime.UtcNow;
-        foundBook.Availability = book.Availability;
-        foundBook.Description = book.Description;
+
+        foundBook.UpdateBook(book); 
         
         return await _bookRepository.UpdateBookAsync(foundBook);
     }

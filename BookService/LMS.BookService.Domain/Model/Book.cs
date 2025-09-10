@@ -17,7 +17,6 @@ public class Book
     [Column("availabily")]
     public Availability Availability { get; set; }
     public string Publisher { get; set; }
-    public int? UserId { get; set; }
     [Column("description")]
     public string? Description { get; set; }
     [Column("published_date")]
@@ -28,4 +27,31 @@ public class Book
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
+    
+    public Book() {}
+
+    public Book(string title, string author, Availability availability, DateTime? publishDate, string description,
+        string publisher)
+    {
+        Title = title;
+        Author = author;
+        Availability = availability;
+        PublishDate = publishDate;
+        Description = description;
+        Publisher = publisher;
+        CreatedAt = DateTime.UtcNow;
+        ModifiedAt = DateTime.UtcNow;
+    }
+    
+    public void UpdateBook(Book book)
+    {
+        Id = book.Id;
+        Title = book.Title;
+        Availability = book.Availability;
+        PublishDate = book.PublishDate;
+        Description = book.Description;
+        Publisher = book.Publisher;
+        CreatedAt = book.CreatedAt;
+        ModifiedAt = DateTime.UtcNow;
+    }
 }

@@ -5,7 +5,7 @@ namespace LMS.BookService.Presentation.Authorization;
 
 public class NumericRoleHandler : AuthorizationHandler<NumericRoleRequirement>
 {
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
         NumericRoleRequirement requirement)
     {
         var roleClaim = context.User.FindFirst(ClaimTypes.Role)?.Value;
@@ -17,5 +17,6 @@ public class NumericRoleHandler : AuthorizationHandler<NumericRoleRequirement>
             }
         }
         
+        return Task.CompletedTask;
     }
 }

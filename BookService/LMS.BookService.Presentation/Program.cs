@@ -4,8 +4,10 @@ using LMS.BookService.Application.IService;
 using LMS.BookService.Infrastructure;
 using LMS.BookService.Infrastructure.Interface;
 using LMS.BookService.Presentation.Authorization;
+using LMS.BookService.Presentation.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -59,13 +61,10 @@ builder.Services.AddAuthentication(options =>
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-
             ValidateLifetime = true,
-
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"])),
         };
@@ -82,8 +81,11 @@ builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5079); // HTTP
-    options.ListenAnyIP(7080); // gRPC or HTTPS if needed
+    options.ListenAnyIP(7080,
+        listenOptions => listenOptions.Protocols = HttpProtocols.Http2); // gRPC or HTTPS if needed
 });
+
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -105,9 +107,12 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<BookAPIService>();
 
 app.Run();

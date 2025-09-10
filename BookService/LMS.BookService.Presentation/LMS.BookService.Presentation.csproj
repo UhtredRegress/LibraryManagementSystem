@@ -10,6 +10,12 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Google.Protobuf" Version="3.32.0" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.72.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
@@ -26,6 +32,7 @@
       <ProjectReference Include="..\LMS.BookService.Application\LMS.BookService.Application.csproj" />
       <ProjectReference Include="..\LMS.BookService.Domain\LMS.BookService.Domain.csproj" />
       <ProjectReference Include="..\LMS.BookService.Infrastructure\LMS.BookService.Infrastructure.csproj" />
+        <Protobuf Include="Protos\BookBorrowService.proto" GrpcServices="Server"></Protobuf>
     </ItemGroup>
 
 </Project>

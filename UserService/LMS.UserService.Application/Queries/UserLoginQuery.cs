@@ -43,8 +43,11 @@ public class UserLoginQueryHandler : IRequestHandler<UserLoginQuery, string>
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Name, user.Username),
+            new Claim(JwtRegisteredClaimNames.Jti, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.PhoneNumber, user.PhoneNumber),
+            new Claim(JwtRegisteredClaimNames.Address, user.Address),
             new Claim("role", user.RoleId.ToString()),
         };
 
