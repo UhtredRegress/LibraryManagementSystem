@@ -1,7 +1,7 @@
 using LMS.BookService.Domain.Enum;
 using LMS.BookService.Domain.Model;
 
-namespace LMS.BookService.Application.IService;
+namespace LMS.BookService.Domain.IService;
 
 public interface IBookService
 {

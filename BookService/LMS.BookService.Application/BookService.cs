@@ -1,11 +1,8 @@
 using LMS.BookService.Domain.Enum;
 using LMS.BookService.Domain.Model;
-using LMS.BookService.Application.IService;
-using LMS.BookService.Infrastructure.Interface;
-using LMS.Shared.Exception;
+using LMS.BookService.Domain.IService;
 
-
-namespace LMS.BookService.Application;
+namespace LMS.BookService.Domain;
 
 public class BookService : IBookService
 {
