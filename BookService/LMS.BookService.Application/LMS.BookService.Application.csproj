@@ -10,7 +10,6 @@
       <ProjectReference Include="..\..\LMS.Shared\LMS.Shared.csproj" />
       <ProjectReference Include="..\LMS.BookService.Domain\LMS.BookService.Domain.csproj" />
       <ProjectReference Include="..\LMS.BookService.Infrastructure\LMS.BookService.Infrastructure.csproj" />
-      <ProjectReference Include="..\LMS.Shared\LMS.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

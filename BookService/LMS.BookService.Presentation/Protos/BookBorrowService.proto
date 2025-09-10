@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-option csharp_namespace = "Library.Grpc";
+option csharp_namespace = "Lirabry.Grpc";
 
 // Request message
 message LoanBookRequest {
-  int32 user_id = 1;
-  int32 book_id = 2;
+  string user_id = 1;
+  string book_id = 2;
 }
 
 // Response message
@@ -15,6 +15,6 @@ message LoanBookResponse {
 }
 
 // gRPC service
-service BookLoanService {
+service LibraryService {
   rpc LoanBook (LoanBookRequest) returns (LoanBookResponse);
 }

@@ -45,7 +45,7 @@ public class UserLoginQueryHandler : IRequestHandler<UserLoginQuery, string>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, user.RoleId.ToString()),
+            new Claim("role", user.RoleId.ToString()),
         };
 
         var token = new JwtSecurityToken(

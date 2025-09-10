@@ -8,11 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\BookService\LMS.BookService.Domain\LMS.BookService.Domain.csproj" />
-      <ProjectReference Include="..\..\BookService\LMS.BookService.Infrastructure\LMS.BookService.Infrastructure.csproj" />
       <ProjectReference Include="..\..\LMS.Shared\LMS.Shared.csproj" />
       <ProjectReference Include="..\LMS.UserService.Infrastructure\LMS.UserService.Infrastructure.csproj" />
-      <ProjectReference Include="..\LMS.Shared\LMS.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BookService\LMS.BookService.Domain\LMS.BookService.Domain.csproj" />
     <ProjectReference Include="..\LMS.UserService.Domain\LMS.UserService.Domain.csproj" />
   </ItemGroup>
 

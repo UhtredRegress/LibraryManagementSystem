@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
+        <OutputType>Exe</OutputType>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
       <UserSecretsId>97bf1dde-d29d-46a2-95fb-c6234fb12efc</UserSecretsId>
@@ -29,18 +30,7 @@
     <ItemGroup>
       <ProjectReference Include="..\LMS.UserService.Application\LMS.UserService.Application.csproj" />
       <ProjectReference Include="..\LMS.UserService.Infrastructure\LMS.UserService.Infrastructure.csproj" />
-      <ProjectReference Include="..\LMS.Shared\LMS.Shared.csproj" />
-        <Protobuf Include="gRPC\Protobuf\BookLoanService.proto" GrpcServices="Server" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="obj\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+      <ProjectReference Include="..\..\LMS.Shared\LMS.Shared.csproj" />
     </ItemGroup>
 
 </Project>

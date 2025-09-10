@@ -17,6 +17,7 @@ public class Book
     [Column("availabily")]
     public Availability Availability { get; set; }
     public string Publisher { get; set; }
+    public int? UserId { get; set; }
     [Column("description")]
     public string? Description { get; set; }
     [Column("published_date")]
@@ -27,5 +28,4 @@ public class Book
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
-    
 }
