@@ -53,6 +53,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Configuration
+    .AddJsonFile(@"D:\Code\Project\LibraryManagementSystem\dev-secrets\appsettings.shared.json", optional: true);
 
 //Add JWT Bearer
 builder.Services.AddAuthentication(options =>

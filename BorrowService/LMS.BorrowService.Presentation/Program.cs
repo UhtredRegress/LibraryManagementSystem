@@ -1,9 +1,9 @@
-using System.Text;
 using FluentValidation;
 using Lirabry.Grpc;
 using LMS.BorrowService.Infrastructure;
 using LMS.BorrowService.Infrastructure.IRepository;
 using LMS.UserService.Application;
+using LMS.UserService.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +11,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using RabbitMQEventBus;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .AddJsonFile(@"D:\Code\Project\LibraryManagementSystem\dev-secrets\appsettings.shared.json", optional: true);
 
 // Add services to the container.
 
@@ -105,7 +108,14 @@ builder.Services.AddSingleton<IChannel>(sp =>
     sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult()
 );
 
+
+
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BorrowDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -119,7 +129,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+
+
 
 app.UseAuthentication();
 app.UseAuthorization();

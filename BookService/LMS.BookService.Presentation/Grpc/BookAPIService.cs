@@ -54,5 +54,27 @@ public class BookAPIService : BookAPI.BookAPIBase
         
         return new CheckExistedBookResponse() {Result = true};
     }
+
+    public override async Task<GetBookInfoResponse> GetRangeBook(GetBookInfoRequest request, ServerCallContext context)
+    {
+        _logger.LogInformation("Received GetRangeBookRequest in the book service");
+
+        var response = new GetBookInfoResponse();
+
+        foreach (var id in request.BookId)
+        {
+            var foundBook = await _bookRepository.GetBookByIdAsync(id);
+            var responseBook = new Book();
+            responseBook.BookId = foundBook.Id;
+            responseBook.Title = foundBook.Title;
+            responseBook.Author = foundBook.Author;
+            responseBook.Publisher = foundBook.Publisher;
+
+            response.Books.Add(responseBook); 
+        }
+
+        _logger.LogInformation("Finished processed the Request");
+        return response;
+    }
     
 }

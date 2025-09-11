@@ -10,6 +10,10 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile(@"D:\Code\Project\LibraryManagementSystem\dev-secrets\appsettings.shared.json", optional: true);
+
+
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddControllers();
@@ -46,7 +50,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 var app = builder.Build();
-        
+
 // Configure the HTTP request pipeline.
 app.MapOpenApi();
 

@@ -58,3 +58,9 @@ nunit-*.xml
 *.sln.DotSettings.user
 
 .env
+/.vs
+/BookService/LMS.BookService.Presentation
+/BorrowService/LMS.BorrowService.Presentation
+/UserService/LMS.UserService.Presentation/LMS.UserService.Presentation.csproj.user
+/dev-secrets
+/LMS.slnLaunch.user
