@@ -11,4 +11,5 @@ public interface IBookService
     Task<IEnumerable<Book>> GetBooksByPublishedDate(DateTime startDate, DateTime endDate);
     Task<IEnumerable<Book>> GetBooksByAvailability(Availability availability);
     Task<IEnumerable<Book>> GetBooksByTitle(string title);
+    Task<IEnumerable<Book>> UpdateRangeBooksAsync(IEnumerable<int> bookId);
 }

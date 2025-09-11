@@ -29,6 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\RabbitMQEventBus\RabbitMQEventBus.csproj" />
       <ProjectReference Include="..\LMS.BookService.Application\LMS.BookService.Application.csproj" />
       <ProjectReference Include="..\LMS.BookService.Domain\LMS.BookService.Domain.csproj" />
       <ProjectReference Include="..\LMS.BookService.Infrastructure\LMS.BookService.Infrastructure.csproj" />

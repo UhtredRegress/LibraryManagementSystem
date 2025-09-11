@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\LMS.Shared\LMS.Shared.csproj" />
+      <ProjectReference Include="..\..\RabbitMQEventBus\RabbitMQEventBus.csproj" />
       <ProjectReference Include="..\LMS.BookService.Domain\LMS.BookService.Domain.csproj" />
       <ProjectReference Include="..\LMS.BookService.Infrastructure\LMS.BookService.Infrastructure.csproj" />
     </ItemGroup>

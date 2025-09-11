@@ -85,4 +85,26 @@ public class BookService : IBookService
         
         return resultList.ToList();
     }
+
+    public async Task<IEnumerable<Book>> UpdateRangeBooksAsync(IEnumerable<int> bookId)
+    {
+        ICollection<Book> bookList = new List<Book>();
+        foreach (var id in bookId)
+        {
+            bookList.Add(await _bookRepository.GetBookByIdAsync(id)); 
+        }
+
+        foreach (var book in bookList)
+        {
+            book.UpdateAvailability(Availability.Borrowed); 
+        }
+
+        foreach (var book in bookList)
+        {
+            await _bookRepository.UpdateBookAsync(book);
+        }
+
+        return bookList; 
+    }
+    
 }

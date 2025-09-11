@@ -5,9 +5,10 @@ namespace LMS.BorrowService.Infrastructure.IRepository;
 
 public interface IBorrowHistoryRepository
 {
-    Task<BorrowHistory> GetBorrowerByIdAsync(int id);
-    Task<IEnumerable<BorrowHistory>> GetBorrowersFilteredAsync(Expression<Func<BorrowHistory, bool>> predicate);
-    Task<BorrowHistory> CreateBorrowerAsync(BorrowHistory borrowHistory);
-    Task<BorrowHistory> UpdateBorrowerAsync(BorrowHistory borrowHistory);
-    Task<BorrowHistory> DeleteBorrowerAsync(BorrowHistory borrowHistory);
+    Task<BorrowHistory> GetBorrowHistoryByIdAsync(int id);
+    Task<IEnumerable<BorrowHistory>> GetBorrowHistoryFilteredAsync(Expression<Func<BorrowHistory, bool>> predicate);
+    Task<BorrowHistory> CreateBorrowHistoryAsync(BorrowHistory borrowHistory);
+    Task<BorrowHistory> UpdateBorrowHistoryAsync(BorrowHistory borrowHistory);
+    Task<BorrowHistory> DeleteBorrowHistoryAsync(BorrowHistory borrowHistory);
+    Task<bool> CreateRangeBorrowHistoryAsync(IEnumerable<BorrowHistory> borrowHistory);
 }

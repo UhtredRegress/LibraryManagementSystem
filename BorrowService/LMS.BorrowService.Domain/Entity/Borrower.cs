@@ -12,8 +12,9 @@ public class Borrower
     
     public Borrower() {}
 
-    public Borrower(string name, string email, string phone, string address)
+    public Borrower(int id, string name, string email, string phone, string address)
     {
+        Id = id;
         Name = name;
         Email = email;
         Phone = phone;

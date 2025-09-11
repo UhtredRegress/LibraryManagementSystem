@@ -1,8 +1,10 @@
 using System.Text;
 using LMS.BookService.Application;
+using LMS.BookService.Application.IntegrationEvent;
 using LMS.BookService.Application.IService;
 using LMS.BookService.Infrastructure;
 using LMS.BookService.Infrastructure.Interface;
+using LMS.BookService.Presentation;
 using LMS.BookService.Presentation.Authorization;
 using LMS.BookService.Presentation.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +13,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
+using RabbitMQEventBus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +89,40 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions => listenOptions.Protocols = HttpProtocols.Http2); // gRPC or HTTPS if needed
 });
 
+builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
+builder.Services.AddSingleton<IConnection>(sp =>
+{
+    var connectionFactory = new ConnectionFactory()
+    {
+        HostName = "localhost",
+        UserName = "guest",
+        Password = "guest"
+    };
+    return connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
+
+builder.Services.AddSingleton<IChannel>(sp =>
+    sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult()
+);
+
+builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
+builder.Services.AddSingleton<IConnection>(sp =>
+{
+    var connectionFactory = new ConnectionFactory()
+    {
+        HostName = "localhost",
+        UserName = "guest",
+        Password = "guest"
+    };
+    return connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
+
+builder.Services.AddSingleton<IChannel>(sp =>
+    sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult());
+
+
 builder.Services.AddGrpc();
 
 var app = builder.Build();
@@ -100,14 +138,14 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;  
 });
 
-
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookServiceDbContext>();
     db.Database.Migrate();
 }
 
-
+var eventBus = app.Services.GetRequiredService<IEventBus>();
+await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>("borrow_queue");
 
 app.UseAuthentication();
 app.UseAuthorization();

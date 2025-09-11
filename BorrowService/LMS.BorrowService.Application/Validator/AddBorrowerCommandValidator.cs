@@ -16,5 +16,6 @@ public class AddBorrowHistoryCommandValidator:AbstractValidator<AddBorrowHistory
         RuleFor(x => x.Address).NotEmpty().WithMessage("Address is required");
         RuleFor(x=> x.bookList)
             .NotEmpty().WithMessage("BookList is required");
+        RuleFor(x=> x.Days).NotEmpty().WithMessage("Day to returned book is required").Must(x => x > 0).WithMessage("Day to returned book must be positive");
     }
 }

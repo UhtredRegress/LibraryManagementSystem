@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.BorrowService.Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.BorrowService.Domain", "BorrowService\LMS.BorrowService.Domain\LMS.BorrowService.Domain.csproj", "{57D6DD4F-AC72-42CB-9238-FB8F19342AE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQEventBus", "RabbitMQEventBus\RabbitMQEventBus.csproj", "{817FE43C-43A4-48E4-AFE8-A4992E88B2B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.NotificationService", "NotificationService\LMS.NotificationService\LMS.NotificationService.csproj", "{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +100,14 @@ Global
 		{57D6DD4F-AC72-42CB-9238-FB8F19342AE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57D6DD4F-AC72-42CB-9238-FB8F19342AE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57D6DD4F-AC72-42CB-9238-FB8F19342AE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{817FE43C-43A4-48E4-AFE8-A4992E88B2B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{817FE43C-43A4-48E4-AFE8-A4992E88B2B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{817FE43C-43A4-48E4-AFE8-A4992E88B2B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{817FE43C-43A4-48E4-AFE8-A4992E88B2B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CC08F4F6-C608-47F3-B8C1-8B68150FEFAE} = {1D892BC8-9C22-415A-9779-D73AFBCB774C}

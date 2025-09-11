@@ -54,4 +54,9 @@ public class Book
         CreatedAt = book.CreatedAt;
         ModifiedAt = DateTime.UtcNow;
     }
+    
+    public void UpdateAvailability(Availability availability)
+    {
+        Availability = availability;
+    }
 }

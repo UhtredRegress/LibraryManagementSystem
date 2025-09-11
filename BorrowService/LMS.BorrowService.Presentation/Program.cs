@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
+using RabbitMQEventBus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,13 +88,29 @@ builder.Services.AddGrpcClient<BookAPI.BookAPIClient>(options =>
 {
     options.Address = new Uri("http://localhost:7080");
 });
+builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
+builder.Services.AddSingleton<IConnection>(sp =>
+{
+    var factory = new ConnectionFactory()
+    {
+        HostName = "localhost",
+        UserName = "guest",
+        Password = "guest"
+    }; 
+    
+    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+});
+
+builder.Services.AddSingleton<IChannel>(sp =>
+    sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult()
+);
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi();   
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

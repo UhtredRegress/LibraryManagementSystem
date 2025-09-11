@@ -14,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\RabbitMQEventBus\RabbitMQEventBus.csproj" />
       <ProjectReference Include="..\LMS.BorrowService.Infrastructure\LMS.BorrowService.Infrastructure.csproj" />
     </ItemGroup>
 

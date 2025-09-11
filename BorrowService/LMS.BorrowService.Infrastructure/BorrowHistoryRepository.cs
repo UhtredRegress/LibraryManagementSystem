@@ -14,34 +14,41 @@ public class BorrowHistoryRepository : IBorrowHistoryRepository
         _context = context;
     }
     
-    public async Task<BorrowHistory> GetBorrowerByIdAsync(int id)
+    public async Task<BorrowHistory> GetBorrowHistoryByIdAsync(int id)
     {
         return await _context.BorrowHistories.FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<BorrowHistory>> GetBorrowersFilteredAsync(Expression<Func<BorrowHistory, bool>> predicate)
+    public async Task<IEnumerable<BorrowHistory>> GetBorrowHistoryFilteredAsync(Expression<Func<BorrowHistory, bool>> predicate)
     {
         return await _context.BorrowHistories.Where(predicate).ToListAsync();
     }
 
-    public async Task<BorrowHistory> CreateBorrowerAsync(BorrowHistory borrowHistory)
+    public async Task<BorrowHistory> CreateBorrowHistoryAsync(BorrowHistory borrowHistory)
     {
         await _context.BorrowHistories.AddAsync(borrowHistory);
         await _context.SaveChangesAsync();
         return borrowHistory;
     }
 
-    public async Task<BorrowHistory> UpdateBorrowerAsync(BorrowHistory borrowHistory)
+    public async Task<BorrowHistory> UpdateBorrowHistoryAsync(BorrowHistory borrowHistory)
     {
         _context.BorrowHistories.Update(borrowHistory);
         await _context.SaveChangesAsync();
         return borrowHistory;
     }
 
-    public async Task<BorrowHistory> DeleteBorrowerAsync(BorrowHistory borrowHistory)
+    public async Task<BorrowHistory> DeleteBorrowHistoryAsync(BorrowHistory borrowHistory)
     {
         _context.BorrowHistories.Remove(borrowHistory); 
         await _context.SaveChangesAsync();
         return borrowHistory;
+    }
+
+    public async Task<bool> CreateRangeBorrowHistoryAsync(IEnumerable<BorrowHistory> borrowHistory)
+    {
+        await _context.BorrowHistories.AddRangeAsync(borrowHistory);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

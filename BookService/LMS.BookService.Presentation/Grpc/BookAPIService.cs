@@ -46,7 +46,7 @@ public class BookAPIService : BookAPI.BookAPIBase
         foreach (var id in BookIdList)
         {
             var result = await _bookRepository.GetBookByIdAsync(id);
-            if (result == null)
+            if (result == null || result.Availability != Availability.Available)
             {
                 return new CheckExistedBookResponse() {Result = false};
             }

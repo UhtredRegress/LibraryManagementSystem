@@ -22,7 +22,7 @@ public class BorrowController:ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> RequestBorrow(IEnumerable<int> bookIds)
+    public async Task<IActionResult> RequestBorrow(IEnumerable<int> bookIds, int days) 
     {
         var userId = Convert.ToInt32(User.FindFirstValue(JwtRegisteredClaimNames.Jti));
         var userName = User.FindFirstValue("name");
@@ -32,12 +32,16 @@ public class BorrowController:ControllerBase
         try
         {
             var result =
-                await _mediator.Send(new AddBorrowHistoryCommand(userId, userName, userAddress, userPhone, userEmail, bookIds));
+                await _mediator.Send(new AddBorrowHistoryCommand(userId, userName, userAddress, userPhone, userEmail, days, bookIds));
+            if (result == false)
+            {
+                return BadRequest("You request a book that is not existed in the library");
+            }
             return Ok(result);
         }
         catch (Exception ex)
         {
-            return BadRequest();
+            return BadRequest(ex.Message);
         }
     }
 }
