@@ -24,28 +24,29 @@ public class RabbitMQEventBus : IEventBus
     public async Task PublishAsync(IntegrationEvent @event)
     {
         using var _channel = await _connection.CreateChannelAsync();
-        await _channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Direct, durable: true);
         var eventName = @event.GetType().Name;
+        await _channel.ExchangeDeclareAsync(eventName, ExchangeType.Fanout, durable: true);
         var message = JsonSerializer.Serialize((object)@event, @event.GetType());
         var body = Encoding.UTF8.GetBytes(message);
         
         await _channel.BasicPublishAsync(
-            exchange: _exchangeName,
-            routingKey: eventName,
+            exchange: eventName,
+            routingKey: "",
             mandatory: false,
             body: body);
     }
     
 
-    public async Task SubscribeAsync<T, TH>(string queueName) where T : IntegrationEvent where TH : IIntegrationEventHandler<T>
+    public async Task SubscribeAsync<T, TH>() where T : IntegrationEvent where TH : IIntegrationEventHandler<T>
     {
-        
-        await _channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Direct, durable: true);
+
+        var queueName = typeof(TH).Name;
         var eventName = typeof(T).Name;
+        await _channel.ExchangeDeclareAsync(eventName, ExchangeType.Fanout, durable: true);
         
         await _channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false);
         
-        await _channel.QueueBindAsync(queue: queueName, exchange: _exchangeName, routingKey: eventName);
+        await _channel.QueueBindAsync(queue: queueName, exchange: eventName, routingKey: eventName);
         
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (ch, ea) =>

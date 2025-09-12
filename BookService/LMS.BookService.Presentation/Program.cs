@@ -4,7 +4,6 @@ using LMS.BookService.Application.IntegrationEvent;
 using LMS.BookService.Application.IService;
 using LMS.BookService.Infrastructure;
 using LMS.BookService.Infrastructure.Interface;
-using LMS.BookService.Presentation;
 using LMS.BookService.Presentation.Authorization;
 using LMS.BookService.Presentation.Grpc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -147,7 +146,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 var eventBus = app.Services.GetRequiredService<IEventBus>();
-await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>("borrow_queue");
+await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>();
 
 app.UseAuthentication();
 app.UseAuthorization();

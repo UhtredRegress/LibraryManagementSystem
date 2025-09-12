@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using Lirabry.Grpc;
 using LMS.NotificationService;
 using MailKit.Net.Smtp;
 using RabbitMQ.Client;
@@ -19,15 +19,18 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult());
 builder.Services.AddSingleton<IChannel>(sp => sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult());
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
-builder.Services.AddScoped<ISmtpClient, SmtpClient>();
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>, BorrowHistoryNotificationHandler>();
-builder.Services.AddScoped<IEmailService,SmtpEmailService>();
+builder.Services.AddScoped<IEmailService,MailKitEmailService>();
+builder.Services.AddGrpcClient<BookAPI.BookAPIClient>(options =>
+{
+    options.Address = new Uri("http://localhost:7080");
+});
 
 var host = builder.Build();
 
 using (var scope = host.Services.CreateScope()) {
     var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-    await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, BorrowHistoryNotificationHandler>("borrow_queue");
- }
+    await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, BorrowHistoryNotificationHandler>();
+}
 
 host.Run();

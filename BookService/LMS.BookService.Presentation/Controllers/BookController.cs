@@ -9,7 +9,7 @@ namespace LMS.BookService.Presentation.Controllers;
 
 [Authorize(Policy = "NumericRolePolicy")]
 [ApiController]
-[Route("api/book")]
+[Route("api/books")]
 public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;

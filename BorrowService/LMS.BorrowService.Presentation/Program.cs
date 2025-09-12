@@ -3,7 +3,6 @@ using Lirabry.Grpc;
 using LMS.BorrowService.Infrastructure;
 using LMS.BorrowService.Infrastructure.IRepository;
 using LMS.UserService.Application;
-using LMS.UserService.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

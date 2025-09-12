@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQEventBus", "RabbitM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.NotificationService", "NotificationService\LMS.NotificationService\LMS.NotificationService.csproj", "{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{EA61B0EB-7836-450A-A11C-46B785C3C995}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +110,10 @@ Global
 		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2A5F151-074F-4A00-BBFA-E5C68A9BDC87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA61B0EB-7836-450A-A11C-46B785C3C995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA61B0EB-7836-450A-A11C-46B785C3C995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA61B0EB-7836-450A-A11C-46B785C3C995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA61B0EB-7836-450A-A11C-46B785C3C995}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CC08F4F6-C608-47F3-B8C1-8B68150FEFAE} = {1D892BC8-9C22-415A-9779-D73AFBCB774C}

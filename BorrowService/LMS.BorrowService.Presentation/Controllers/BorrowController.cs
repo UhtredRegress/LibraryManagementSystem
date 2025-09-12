@@ -9,7 +9,7 @@ namespace LMS.BorrowService.Presentation.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/borrow")]
 public class BorrowController:ControllerBase
 {
     private readonly ILogger<BorrowController> _logger; 

@@ -1,21 +1,25 @@
 ﻿using RabbitMQEventBus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Lirabry.Grpc;
+using LMS.NotificationService.Helper;
 
 namespace LMS.NotificationService
 {
-    public class BorrowHistoryNotificationHandler(IEmailService emailService, ILogger<BorrowHistoryCreatedIntegratedEvent> logger) : IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>
+    public class BorrowHistoryNotificationHandler(IEmailService emailService, ILogger<BorrowHistoryNotificationHandler> logger, BookAPI.BookAPIClient client) : IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>
     {
         private readonly IEmailService _emailService = emailService;
-        private readonly ILogger<BorrowHistoryCreatedIntegratedEvent> _logger = logger;
+        private readonly ILogger<BorrowHistoryNotificationHandler> _logger = logger;
+        private readonly BookAPI.BookAPIClient _client = client;
 
-        public Task Handle(BorrowHistoryCreatedIntegratedEvent @event)
+        public async Task Handle(BorrowHistoryCreatedIntegratedEvent @event)
         {
             _logger.LogInformation("NotificationService receive borrow history");
-            return Task.CompletedTask; 
+            var requestBookList = new GetBookInfoRequest();
+            requestBookList.BookId.Add(@event.BookIds);
+            var response = await _client.GetRangeBookAsync(requestBookList);  
+            
+            var body = CreateMailHelper.CreateMailToNotifyBorrowStatus(username: @event.Username, startDate: @event.StartDate , returnDate: @event.EndDate, response: response);
+            _emailService.SendEmailAsync(to: @event.Email, subject:"Borrow books from the Library Management System", body: body);
+            _logger.LogInformation("NotificationService finished sent email");
         }
     }
 }

@@ -3,15 +3,13 @@ using MimeKit;
 
 namespace LMS.NotificationService;
 
-public class SmtpEmailService : IEmailService
+public class MailKitEmailService : IEmailService
 {
     private readonly IConfiguration _config;
-    private readonly ISmtpClient _smtpClient;
 
-    public SmtpEmailService(IConfiguration config, ISmtpClient smtpClient)
+    public MailKitEmailService(IConfiguration config)
     {
         _config = config;
-        _smtpClient = smtpClient;
     }
 
     public async Task SendEmailAsync(string to, string subject, string body)
@@ -22,12 +20,11 @@ public class SmtpEmailService : IEmailService
         email.Subject = subject;
         email.Body = new TextPart("plain") { Text = body };
 
-  
+        using var _smtpClient = new SmtpClient();
         await _smtpClient.ConnectAsync(_config["Smtp:Host"],
                                 int.Parse(_config["Smtp:Port"]),
-                                MailKit.Security.SecureSocketOptions.StartTls);
+                                MailKit.Security.SecureSocketOptions.None);
         await _smtpClient.SendAsync(email);
         await _smtpClient.DisconnectAsync(true);
-
     }
 }
