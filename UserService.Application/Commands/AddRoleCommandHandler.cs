@@ -1,7 +1,7 @@
-using LMS.Shared.DTOs;
 using MediatR;
 using UserService.Domain.Model;
 using UserService.Infrastructure.Interface;
+using Shared.DTOs;
 
 namespace UserService.Application.Commands;
 

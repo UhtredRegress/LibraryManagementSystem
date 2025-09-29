@@ -9,10 +9,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BookService.Infrastructure\BookService.Infrastructure.csproj" />
-      <ProjectReference Include="..\LMS.Shared\LMS.Shared.csproj" />
       <ProjectReference Include="..\RabbitMQEventBus\RabbitMQEventBus.csproj" />
       <ProjectReference Include="..\BookService.Domain\BookService.Domain.csproj" />
       <ProjectReference Include="..\BookService.Infrastructure\BookService.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>

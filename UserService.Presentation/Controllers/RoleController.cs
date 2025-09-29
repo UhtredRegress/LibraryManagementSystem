@@ -1,7 +1,7 @@
-using LMS.Shared.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Commands;
+using Shared.DTOs;
 
 namespace UserService.Presentation.Controllers;
 

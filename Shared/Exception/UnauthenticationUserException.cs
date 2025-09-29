@@ -1,4 +1,4 @@
-namespace LMS.Shared.Exception;
+namespace Shared.Exception;
 
 public class UnauthenticationUserException : System.Exception
 {

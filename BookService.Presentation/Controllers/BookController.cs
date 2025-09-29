@@ -1,9 +1,9 @@
 using BookService.Application.IService;
 using BookService.Domain.Enum;
 using BookService.Domain.Model;
-using LMS.Shared.Exception;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Exception;
 
 namespace BookService.Presentation.Controllers;
 

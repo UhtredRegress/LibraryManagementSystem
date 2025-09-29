@@ -2,8 +2,7 @@ using BookService.Application.IService;
 using BookService.Domain.Enum;
 using BookService.Domain.Model;
 using BookService.Infrastructure.Interface;
-
-using LMS.Shared.Exception;
+using Shared.Exception;
 
 namespace BookService.Application;
 

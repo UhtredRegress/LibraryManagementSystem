@@ -1,4 +1,4 @@
-namespace LMS.Shared.DTOs;
+namespace Shared.DTOs;
 
 public class LoginDTO
 {
