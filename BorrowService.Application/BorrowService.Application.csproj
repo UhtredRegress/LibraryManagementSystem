@@ -17,6 +17,7 @@
     <ItemGroup>
       <ProjectReference Include="..\RabbitMQEventBus\RabbitMQEventBus.csproj" />
       <ProjectReference Include="..\BorrowService.Infrastructure\BorrowService.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
 </Project>

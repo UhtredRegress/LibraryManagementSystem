@@ -8,4 +8,6 @@ public interface IRoleRepository
     Task<Role?> GetRoleByIdAsync(int id);
     Task<Role?> GetRoleByTitleAsync(string title);
     Task<int> GetRoleCount();
+    Task<Role> UpdateRoleAsync(Role role);
+    Task<bool> DeleteRoleAsync(Role role);
 }

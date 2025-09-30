@@ -53,7 +53,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Configuration
     .AddJsonFile(@"D:\Code\Project\LibraryManagementSystem\dev-secrets\appsettings.shared.json", optional: true);
-
+    
 //Add JWT Bearer
 builder.Services.AddAuthentication(options =>
     {
@@ -76,7 +76,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("NumericRolePolicy", policy =>
+    options.AddPolicy("StudentNumericRolePolicy", policy =>
         policy.Requirements.Add(new NumericRoleRequirement(roleRequirement: 2)));
 });
 

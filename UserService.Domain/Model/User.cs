@@ -1,6 +1,6 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Enum;
 
 
 namespace UserService.Domain.Model;
@@ -34,6 +34,45 @@ public class User
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
-
     
+    public Status Status { get; private set; }
+
+    public User() { }
+
+    public User(string username, string password, string email, string phoneNumber, string address, int? roleId)
+    {
+        Username = username;
+        Password = password;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Address = address;
+        RoleId = roleId;
+    }
+    public User UpdateInformation(User updateUser)
+    {
+        Username = updateUser.Username;
+        RoleId = updateUser.RoleId;
+        Email = updateUser.Email;
+        PhoneNumber = updateUser.PhoneNumber;
+        Address = updateUser.Address;
+        ModifiedAt = DateTime.UtcNow;
+        Status = updateUser.Status;
+        return this;
+    }
+
+    public static User UserRegister(string username, string password, string email, string phoneNumber, string address, int? roleId)
+    {
+        User user = new User(username, password, email, phoneNumber, address, roleId);
+        user.CreatedAt = DateTime.UtcNow;
+        user.ModifiedAt = DateTime.UtcNow;
+        user.Status = Status.Inactive;
+        return user;
+    }
+
+    public User ActivateUser()
+    {
+        Status = Status.Active;
+        ModifiedAt = DateTime.UtcNow;
+        return this;
+    }
 }

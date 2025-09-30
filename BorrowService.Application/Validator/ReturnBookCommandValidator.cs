@@ -4,19 +4,18 @@ using FluentValidation.Validators;
 
 namespace BorrowService.Application.Validator;
 
-public class AddBorrowHistoryCommandValidator:AbstractValidator<AddBorrowHistoryCommand>
+public class ReturnBookCommandValidator : AbstractValidator<ReturnBookCommand>
 {
-    public AddBorrowHistoryCommandValidator()
+    public ReturnBookCommandValidator()
     {
-        RuleFor(x => x.userId).NotNull().WithMessage("UserId should not be empty");
+        RuleFor(x => x.UserId).NotNull().WithMessage("UserId should not be empty");
         RuleFor(x=> x.Name).NotNull().WithMessage("Name cannot be empty");
         RuleFor(x => x.Phone).NotNull().WithMessage("Phone is required");
         RuleFor(x => x.Email)
             .NotNull().WithMessage("Email is required")
             .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Email is not valid");
         RuleFor(x => x.Address).NotNull().WithMessage("Address is required");
-        RuleFor(x=> x.bookList)
+        RuleFor(x=> x.BookList)
             .NotNull().WithMessage("BookList is required");
-        RuleFor(x=> x.Days).NotNull().WithMessage("Day to returned book is required").Must(x => x > 0).WithMessage("Day to returned book must be positive");
     }
 }

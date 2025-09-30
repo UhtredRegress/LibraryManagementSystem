@@ -21,4 +21,11 @@ public static class CreateMailHelper
         emailBody.AppendLine("Thank you for your borrowing books.");
         return emailBody.ToString();
     }
+
+    public static string CreateMailToNofifyToken(string token)
+    {
+        var emailBody = new StringBuilder();
+        emailBody.AppendLine($"This is your token : {token}");
+        return emailBody.ToString();
+    }
 }

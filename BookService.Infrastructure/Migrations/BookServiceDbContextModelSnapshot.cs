@@ -72,7 +72,7 @@ namespace LMS.BookService.Infrastructure.Migrations
 
                     b.HasIndex("Title");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 #pragma warning restore 612, 618
         }

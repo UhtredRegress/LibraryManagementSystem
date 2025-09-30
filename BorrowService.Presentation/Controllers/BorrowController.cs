@@ -21,18 +21,19 @@ public class BorrowController:ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost]
+    [HttpPost("borrow")]
     public async Task<IActionResult> RequestBorrow(IEnumerable<int> bookIds, int days) 
     {
-        var userId = Convert.ToInt32(User.FindFirstValue(JwtRegisteredClaimNames.Jti));
-        var userName = User.FindFirstValue("name");
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userName = User.FindFirstValue(JwtRegisteredClaimNames.Name);
         var userAddress = User.FindFirstValue(JwtRegisteredClaimNames.Address);
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
         var userPhone = User.FindFirstValue(JwtRegisteredClaimNames.PhoneNumber);
+        
         try
         {
             var result =
-                await _mediator.Send(new AddBorrowHistoryCommand(userId, userName, userAddress, userPhone, userEmail, days, bookIds));
+                await _mediator.Send(new AddBorrowHistoryCommand(userIdClaim, userName, userAddress, userPhone, userEmail, days, bookIds));
             if (result == false)
             {
                 return BadRequest("You request a book that is not existed in the library");
@@ -43,5 +44,16 @@ public class BorrowController:ControllerBase
         {
             return BadRequest(ex.Message);
         }
+    }
+
+    [HttpPost("return")]
+    public async Task<IActionResult> ReturnBook(IEnumerable<int> bookIds)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        int.TryParse(userIdClaim, out var userId);
+        var username  = User.FindFirstValue(JwtRegisteredClaimNames.Name);
+        var userAddress = User.FindFirstValue(JwtRegisteredClaimNames.Address); 
+        
+        return Ok();
     }
 }

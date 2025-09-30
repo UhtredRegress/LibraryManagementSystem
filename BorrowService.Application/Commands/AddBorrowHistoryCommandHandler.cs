@@ -24,8 +24,13 @@ public class AddBorrowHistoryCommandHandler: IRequestHandler<AddBorrowHistoryCom
     
     public async Task<bool> Handle(AddBorrowHistoryCommand request, CancellationToken cancellationToken)
     {
-        var foundBorrower = await _borrowerRepository.GetBorrowerByIdAsync(request.Id) ?? 
-                            await _borrowerRepository.CreateBorrowerAsync(new Borrower(id: request.Id, name: request.Name, phone: request.Phone, email: request.Email, address: request.Address));
+
+        if (!int.TryParse(request.userId, out int id))
+        {
+            throw new InvalidDataException("UserID is not an valid integer");
+        }
+        var foundBorrower = await _borrowerRepository.GetBorrowerByIdAsync(id) ?? 
+                            await _borrowerRepository.CreateBorrowerAsync(new Borrower(id: id, name: request.Name, phone: request.Phone, email: request.Email, address: request.Address));
 
         var resultCheckBoookRequest = await _grpcClient.RequestCheckExistedBook(request.bookList);
 
@@ -38,7 +43,7 @@ public class AddBorrowHistoryCommandHandler: IRequestHandler<AddBorrowHistoryCom
 
         foreach (var bookId in request.bookList)
         {
-            var borrowHistory = new BorrowHistory(borrowerId: request.Id,bookId: bookId,days: request.Days);
+            var borrowHistory = new BorrowHistory(borrowerId: id,bookId: bookId,days: request.Days);
             borrowHistoryList.Add(borrowHistory);
         }
         

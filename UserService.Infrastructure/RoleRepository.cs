@@ -34,4 +34,18 @@ public class RoleRepository : IRoleRepository
     {
         return await _dbContext.Roles.CountAsync();
     }
+
+    public async Task<Role> UpdateRoleAsync(Role role)
+    {
+        _dbContext.Roles.Update(role);
+        await _dbContext.SaveChangesAsync();
+        return role;
+    }
+
+    public async Task<bool> DeleteRoleAsync(Role role)
+    {
+        _dbContext.Roles.Remove(role);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
 }

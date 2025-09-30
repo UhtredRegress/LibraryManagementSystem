@@ -7,7 +7,7 @@ using Shared.Exception;
 
 namespace BookService.Presentation.Controllers;
 
-[Authorize(Policy = "NumericRolePolicy")]
+[Authorize(Policy = "StudentNumericRolePolicy")]
 [ApiController]
 [Route("api/books")]
 public class BookController : ControllerBase

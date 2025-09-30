@@ -91,23 +91,6 @@ builder.Services.AddGrpcClient<BookAPI.BookAPIClient>(options =>
     options.Address = new Uri("http://localhost:7080");
 });
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
-builder.Services.AddSingleton<IConnection>(sp =>
-{
-    var factory = new ConnectionFactory()
-    {
-        HostName = "localhost",
-        UserName = "guest",
-        Password = "guest"
-    }; 
-    
-    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
-});
-
-builder.Services.AddSingleton<IChannel>(sp =>
-    sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult()
-);
-
-
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

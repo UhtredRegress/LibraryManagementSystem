@@ -19,16 +19,12 @@ public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, Role>
     {
         
         var mappingRole = new Role();
+        
         mappingRole.Title = request.RoleDTO.Title;
-        mappingRole.Id = await GenerateRoleId();
+        mappingRole.Id = (int) Math.Pow(2, await _roleRepo.GetRoleCount());
         mappingRole.CreatedAt = DateTime.UtcNow;
         mappingRole.ModifiedAt = DateTime.UtcNow;
 
         return await _roleRepo.AddRoleAsync(mappingRole);
-    }
-    
-    private async Task<int> GenerateRoleId()
-    {
-        return (int) Math.Pow(2, await _roleRepo.GetRoleCount());
     }
 }
