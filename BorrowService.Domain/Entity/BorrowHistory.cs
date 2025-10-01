@@ -13,6 +13,8 @@ public class BorrowHistory
     public Borrower Borrower { get; set; }
     
     public int BookId { get; set; }
+    public DateTime? ReturnDate { get; private set; }
+    public int? ReturnedConfirmBy { get; private set; }
 
     public BorrowHistory() {}
     public BorrowHistory(int borrowerId, int bookId, int days)
@@ -22,5 +24,21 @@ public class BorrowHistory
         BorrowerId = borrowerId;
         BookId = bookId;
         Status = BorrowStatus.Approved;
+        ReturnDate = null;
+        ReturnedConfirmBy = null;
+    }
+
+    public BorrowHistory UpdateStatus(BorrowStatus borrowStatus)
+    {
+        Status = borrowStatus;
+        return this;
+    }
+
+    public BorrowHistory UpdateReturnDate(int userId)
+    {
+        Status = BorrowStatus.Approved;
+        ReturnDate = DateTime.UtcNow;
+        ReturnedConfirmBy = userId;
+        return this;
     }
 }

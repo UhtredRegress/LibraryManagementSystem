@@ -1,10 +1,11 @@
 using System.Text;
-using BookService.Application.IntegrationEvent;
 using BookService.Application.IService;
 using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
 using BookService.Presentation.Authorization;
 using BookService.Presentation.Grpc;
+using BookService.Application.IntegrationEventHandler;
+using BookService.Presentation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -108,22 +109,13 @@ builder.Services.AddSingleton<IChannel>(sp =>
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
-builder.Services.AddSingleton<IConnection>(sp =>
+builder.Services.AddAuthorization(options => options.AddPolicy("LibrarianNumericRolePolicy", policy =>
 {
-    var connectionFactory = new ConnectionFactory()
-    {
-        HostName = "localhost",
-        UserName = "guest",
-        Password = "guest"
-    };
-    return connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
-});
-
-builder.Services.AddSingleton<IChannel>(sp =>
-    sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult());
-
+    policy.Requirements.Add(new NumericRoleRequirement(roleRequirement: 2));
+}));
 
 builder.Services.AddGrpc();
+builder.Services.AddHostedService<SubscribeHandlerService>();
 
 var app = builder.Build();
 
@@ -144,8 +136,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-var eventBus = app.Services.GetRequiredService<IEventBus>();
-await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>();
+//var eventBus = app.Services.GetRequiredService<IEventBus>();
+//await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>();
 
 app.UseAuthentication();
 app.UseAuthorization();

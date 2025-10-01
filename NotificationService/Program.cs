@@ -5,19 +5,7 @@ using RabbitMQ.Client;
 using RabbitMQEventBus;
 
 var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddSingleton(sp =>
-{
-    var connectionFactory = new ConnectionFactory()
-    {
-        HostName = "localhost",
-        UserName = "guest",
-        Password = "guest"
-    };
-    return connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
-});
 
-builder.Services.AddSingleton(sp => sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult());
-builder.Services.AddSingleton<IChannel>(sp => sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult());
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>, BorrowHistoryNotificationHandler>();
 builder.Services.AddScoped<IIntegrationEventHandler<ConfirmEmailIntegratedEvent>, ConfirmEmailIntegratedEventHandler>();

@@ -13,7 +13,7 @@ public class BookRepository : IBookRepository
     {
         _context = context;
     }
-    public async Task<Book?> GetBookByIdAsync(int id)
+    public async Task<Book> GetBookByIdAsync(int id)
     {
         return await _context.Books.FirstOrDefaultAsync(b => b.Id == id); 
     }
@@ -43,5 +43,16 @@ public class BookRepository : IBookRepository
     {
         return await _context.Books.Where(expression).ToListAsync();
     }
-    
+
+    public async Task<IEnumerable<Book>> GetRangeBookByIdAsync(IEnumerable<int> bookIds)
+    {
+        return await _context.Books.Where(book => bookIds.Contains(book.Id)).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Book>> UpdateRangeBookAsync(IEnumerable<Book> books)
+    {
+        _context.Books.UpdateRange(books);
+        await _context.SaveChangesAsync();
+        return books;
+    }
 }

@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using BorrowService.Domain.Entity;
+using BorrowService.Domain.ValueObject;
 using BorrowService.Infrastructure.IRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,4 +52,22 @@ public class BorrowHistoryRepository : IBorrowHistoryRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<IEnumerable<BorrowHistory>> UpdateRangeBorrowHistoryAsync(
+        IEnumerable<BorrowHistory> borrowHistory)
+    {
+        _context.UpdateRange(borrowHistory);
+        await _context.SaveChangesAsync();
+        return borrowHistory;
+    }
+
+    public async Task<IEnumerable<BorrowHistory>> GetBorrowHistoryForReturnBookAsync(IEnumerable<int> bookList, int userId)
+    {
+        return await _context.BorrowHistories
+            .Where(x => bookList.Contains(x.BookId))
+            .Where(x => x.Status == BorrowStatus.Approved)
+            .Where(x => x.BorrowerId == userId)
+            .ToListAsync();
+    }
+    
 }

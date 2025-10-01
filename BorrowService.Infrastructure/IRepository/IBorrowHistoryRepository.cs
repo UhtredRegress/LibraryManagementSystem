@@ -11,4 +11,6 @@ public interface IBorrowHistoryRepository
     Task<BorrowHistory> UpdateBorrowHistoryAsync(BorrowHistory borrowHistory);
     Task<BorrowHistory> DeleteBorrowHistoryAsync(BorrowHistory borrowHistory);
     Task<bool> CreateRangeBorrowHistoryAsync(IEnumerable<BorrowHistory> borrowHistory);
+    Task<IEnumerable<BorrowHistory>> UpdateRangeBorrowHistoryAsync(IEnumerable<BorrowHistory> borrowHistory);
+    Task<IEnumerable<BorrowHistory>> GetBorrowHistoryForReturnBookAsync(IEnumerable<int> bookList, int userId);
 }

@@ -2,7 +2,7 @@ using BookService.Application.IService;
 using Microsoft.Extensions.Logging;
 using RabbitMQEventBus;
 
-namespace BookService.Application.IntegrationEvent;
+namespace BookService.Application.IntegrationEventHandler;
 
 public class UpdateBookIntegrationHandler : IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent> 
 {

@@ -4,12 +4,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Shared.Exception;
 
 namespace BorrowService.Presentation.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/borrow")]
+[Route("api/borrows")]
 public class BorrowController:ControllerBase
 {
     private readonly ILogger<BorrowController> _logger; 
@@ -21,7 +22,7 @@ public class BorrowController:ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("borrow")]
+    [HttpPost]
     public async Task<IActionResult> RequestBorrow(IEnumerable<int> bookIds, int days) 
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -36,7 +37,7 @@ public class BorrowController:ControllerBase
                 await _mediator.Send(new AddBorrowHistoryCommand(userIdClaim, userName, userAddress, userPhone, userEmail, days, bookIds));
             if (result == false)
             {
-                return BadRequest("You request a book that is not existed in the library");
+                return BadRequest( new { message = "You request a book that is not available in the library"});
             }
             return Ok(result);
         }
@@ -46,14 +47,34 @@ public class BorrowController:ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPost("return")]
     public async Task<IActionResult> ReturnBook(IEnumerable<int> bookIds)
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        int.TryParse(userIdClaim, out var userId);
         var username  = User.FindFirstValue(JwtRegisteredClaimNames.Name);
-        var userAddress = User.FindFirstValue(JwtRegisteredClaimNames.Address); 
-        
-        return Ok();
+        var address = User.FindFirstValue(JwtRegisteredClaimNames.Address);
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        var phoneNumber = User.FindFirstValue(JwtRegisteredClaimNames.PhoneNumber);
+
+        try
+        {
+            var result =
+                await _mediator.Send(new ReturnBookCommand(userIdClaim, email, username, address, phoneNumber,
+                    bookIds));
+            return Ok( new {message = "You have successfully request to return please wait for response", bookList = result });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (NotFoundDataException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
