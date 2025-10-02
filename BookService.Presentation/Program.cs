@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using RabbitMQ.Client;
 using RabbitMQEventBus;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -90,23 +89,13 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions => listenOptions.Protocols = HttpProtocols.Http2); // gRPC or HTTPS if needed
 });
 
-builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
-builder.Services.AddSingleton<IConnection>(sp =>
-{
-    var connectionFactory = new ConnectionFactory()
-    {
-        HostName = "localhost",
-        UserName = "guest",
-        Password = "guest"
-    };
-    return connectionFactory.CreateConnectionAsync().GetAwaiter().GetResult();
-});
-
-builder.Services.AddSingleton<IChannel>(sp =>
-    sp.GetRequiredService<IConnection>().CreateChannelAsync().GetAwaiter().GetResult()
-);
 
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
+builder.Services
+    .AddScoped<IIntegrationEventHandler<RequestReturnBookIntegratedEvent>, RequestReturnBookIntegrationEventHandler>();
+builder.Services
+    .AddScoped<IIntegrationEventHandler<ConfirmBookReturnedIntegratedEvent>,
+        ConfirmBookReturnedIntegrationEventHandler>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
 builder.Services.AddAuthorization(options => options.AddPolicy("LibrarianNumericRolePolicy", policy =>

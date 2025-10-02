@@ -36,7 +36,7 @@ public class BorrowHistory
 
     public BorrowHistory UpdateReturnDate(int userId)
     {
-        Status = BorrowStatus.Approved;
+        Status = BorrowStatus.Done;
         ReturnDate = DateTime.UtcNow;
         ReturnedConfirmBy = userId;
         return this;

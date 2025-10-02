@@ -14,13 +14,8 @@ builder.Services.AddGrpcClient<BookAPI.BookAPIClient>(options =>
 {
     options.Address = new Uri("http://localhost:7080");
 });
+builder.Services.AddHostedService<SubscribeHandlerService>();
 
 var host = builder.Build();
-
-using (var scope = host.Services.CreateScope()) {
-    var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-    await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, BorrowHistoryNotificationHandler>();
-    await eventBus.SubscribeAsync<ConfirmEmailIntegratedEvent, ConfirmEmailIntegratedEventHandler>();
-}
 
 host.Run();

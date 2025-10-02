@@ -44,12 +44,20 @@ public class BookAPIService : BookAPI.BookAPIBase
 
         List<int> BookIdList = request.BookId.ToList();
 
-        foreach (var id in BookIdList)
+        var foundBookList = await _bookRepository.GetRangeBookByIdAsync(BookIdList);
+
+        if (foundBookList.Count() != BookIdList.Count)
         {
-            var result = await _bookRepository.GetBookByIdAsync(id);
-            if (result == null || result.Availability != Availability.Available)
+            _logger.LogError("There are book not found in the database ");
+            return new CheckExistedBookResponse() { Result = false };
+        }
+
+        foreach (var bookItem in foundBookList)
+        {
+            if (bookItem.Stock <= 0)
             {
-                return new CheckExistedBookResponse() {Result = false};
+                _logger.LogError("Books are not available in the library");
+                return new CheckExistedBookResponse() { Result = false };
             }
         }
         

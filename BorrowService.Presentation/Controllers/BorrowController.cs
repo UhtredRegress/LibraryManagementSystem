@@ -35,11 +35,22 @@ public class BorrowController:ControllerBase
         {
             var result =
                 await _mediator.Send(new AddBorrowHistoryCommand(userIdClaim, userName, userAddress, userPhone, userEmail, days, bookIds));
-            if (result == false)
+            if (result.IsSuccess)
             {
-                return BadRequest( new { message = "You request a book that is not available in the library"});
+                return Ok(new {message = "You have borrowed successfully these book",borrowHistory = result});
             }
-            return Ok(result);
+            else
+            {
+                var error = result.Errors.First();
+                if (error.Metadata.Count != 0)
+                {
+                    return BadRequest(new {message = error.Message, data = error.Metadata});
+                }
+                else
+                {
+                    return BadRequest(new {message = error.Message});
+                }
+            }
         }
         catch (Exception ex)
         {

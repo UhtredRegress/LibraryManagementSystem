@@ -9,8 +9,11 @@ using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using RabbitMQEventBus;
 using System.Text;
+using BorrowkService.Presentation.Authorization;
 using BorrowService.Application.Behavior;
 using BorrowService.Infrastructure.IRepository;
+using BorrowService.Presentation.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -91,6 +94,11 @@ builder.Services.AddGrpcClient<BookAPI.BookAPIClient>(options =>
     options.Address = new Uri("http://localhost:7080");
 });
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("LibrarianRoleRequirement", policy => policy.AddRequirements(new NumericRoleRequirement(2)));
+});
+builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

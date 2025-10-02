@@ -18,7 +18,7 @@ public class BookService : IBookService
 
     public async Task<Book> AddBookAsync(Book book)
     {
-        Book addedBook = new Book(book.Title, book.Author, book.Availability, book.PublishDate, book.Description,
+        Book addedBook = new Book(book.Title, book.Author, book.Stock, book.Availability, book.PublishDate, book.Description,
             book.Description);
         
         return await _bookRepository.AddBookAsync(addedBook);
@@ -88,23 +88,16 @@ public class BookService : IBookService
 
     public async Task<IEnumerable<Book>> UpdateRangeBooksAsync(IEnumerable<int> bookId)
     {
-        ICollection<Book> bookList = new List<Book>();
-        foreach (var id in bookId)
+        var foundBookList = await _bookRepository.GetRangeBookByIdAsync(bookId);
+        
+        foreach (var book in foundBookList)
         {
-            bookList.Add(await _bookRepository.GetBookByIdAsync(id)); 
+            book.BookBorrowed(); 
         }
-
-        foreach (var book in bookList)
-        {
-            book.UpdateAvailability(Availability.Borrowed); 
-        }
-
-        foreach (var book in bookList)
-        {
-            await _bookRepository.UpdateBookAsync(book);
-        }
-
-        return bookList; 
+        
+        await _bookRepository.UpdateRangeBookAsync(foundBookList);
+        
+        return foundBookList; 
     }
     
 }

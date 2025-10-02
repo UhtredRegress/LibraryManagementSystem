@@ -10,7 +10,7 @@ public class Book
     public int Id { get; set; }
     [Required]
     [Column("title")]
-    public string Title { get; set; }
+    public string? Title { get; set; }
     [Column("author")]
     public string? Author { get; set; }
     [Required]
@@ -27,10 +27,11 @@ public class Book
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
+    public int Stock { get; private set; }
     
     public Book() {}
 
-    public Book(string title, string author, Availability availability, DateTime? publishDate, string description,
+    public Book(string title, string author, int stock, Availability availability, DateTime? publishDate, string description,
         string publisher)
     {
         Title = title;
@@ -41,6 +42,7 @@ public class Book
         Publisher = publisher;
         CreatedAt = DateTime.UtcNow;
         ModifiedAt = DateTime.UtcNow;
+        Stock = stock;
     }
     
     public void UpdateBook(Book book)
@@ -53,10 +55,16 @@ public class Book
         Publisher = book.Publisher;
         CreatedAt = book.CreatedAt;
         ModifiedAt = DateTime.UtcNow;
+        Stock = book.Stock;
     }
     
     public void UpdateAvailability(Availability availability)
     {
         Availability = availability;
+    }
+
+    public void BookBorrowed()
+    {
+        Stock--;
     }
 }

@@ -30,13 +30,21 @@ public class ConfirmBookReturnedCommandHandler : IRequestHandler<ConfirmBookRetu
 
         if (foundBorrowHistory == null || foundBorrowHistory.Status != BorrowStatus.Pending)
         {
-            throw new InvalidDataException("There is no borrow history for the requested book");
+            _logger.LogInformation("Borrow History not found, throwing exception");
+            throw new InvalidDataException("There is no borrow history for this request");
         }
 
+        _logger.LogInformation("Found borrow history, now update status of borrow history");
         foundBorrowHistory.UpdateReturnDate(request.UserId);
+        
+        _logger.LogInformation("Update borrow history to database");
         await _borrowHistoryRepository.UpdateBorrowHistoryAsync(foundBorrowHistory);
+        
+        _logger.LogInformation("Publish Confirm Book Returned Integration Event"); 
         await _eventBus.PublishAsync(new ConfirmBookReturnedIntegratedEvent(foundBorrowHistory.BookId));
+        
         _logger.LogInformation("ConfirmBookReturnedCommand received, finishing process");
+        
         return foundBorrowHistory;
     }
 }
