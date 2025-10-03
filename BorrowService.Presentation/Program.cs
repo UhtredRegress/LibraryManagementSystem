@@ -96,7 +96,11 @@ builder.Services.AddGrpcClient<BookAPI.BookAPIClient>(options =>
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("LibrarianRoleRequirement", policy => policy.AddRequirements(new NumericRoleRequirement(2)));
+    options.AddPolicy("LibrarianRoleRequirement", policy =>
+    {
+        policy.AddRequirements(new NumericRoleRequirement(2));
+        policy.RequireClaim("status","Active");
+    });
 });
 builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
 
@@ -118,9 +122,6 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;  
     });
 }
-
-
-
 
 app.UseAuthentication();
 app.UseAuthorization();

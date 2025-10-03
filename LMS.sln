@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "Noti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{6EFBC1B6-91CE-4F0F-83AB-DBE58C054474}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Application.Test", "test\UserService.Application.Test\UserService.Application.Test.csproj", "{EA16602F-746F-45E8-BEB7-9E08853A440C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +110,10 @@ Global
 		{6EFBC1B6-91CE-4F0F-83AB-DBE58C054474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EFBC1B6-91CE-4F0F-83AB-DBE58C054474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EFBC1B6-91CE-4F0F-83AB-DBE58C054474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA16602F-746F-45E8-BEB7-9E08853A440C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA16602F-746F-45E8-BEB7-9E08853A440C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA16602F-746F-45E8-BEB7-9E08853A440C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA16602F-746F-45E8-BEB7-9E08853A440C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

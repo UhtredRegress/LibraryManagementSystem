@@ -15,8 +15,18 @@ public class AddBorrowHistoryCommandValidator:AbstractValidator<AddBorrowHistory
             .NotNull().WithMessage("Email is required")
             .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Email is not valid");
         RuleFor(x => x.Address).NotNull().WithMessage("Address is required");
-        RuleFor(x=> x.bookList)
-            .NotNull().WithMessage("BookList is required");
+        RuleFor(x => x.bookList)
+            .NotNull().WithMessage("BookList is required")
+            .Must(bookList =>
+            {
+                var bookListSet = bookList.ToHashSet();
+                if (bookListSet.Count != bookList.Count())
+                {
+                    return false; 
+                }
+
+                return true;
+            }).WithMessage("You request to borrow duplicate book");
         RuleFor(x=> x.Days).NotNull().WithMessage("Day to returned book is required").Must(x => x > 0).WithMessage("Day to returned book must be positive");
     }
 }

@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using BorrowService.Application.Commands;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Shared.Exception;
 
 namespace BorrowService.Presentation.Controllers;
 
@@ -30,27 +30,32 @@ public class BorrowController:ControllerBase
         var userAddress = User.FindFirstValue(JwtRegisteredClaimNames.Address);
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
         var userPhone = User.FindFirstValue(JwtRegisteredClaimNames.PhoneNumber);
-        
+
         try
         {
             var result =
-                await _mediator.Send(new AddBorrowHistoryCommand(userIdClaim, userName, userAddress, userPhone, userEmail, days, bookIds));
+                await _mediator.Send(new AddBorrowHistoryCommand(userIdClaim, userName, userAddress, userPhone,
+                    userEmail, days, bookIds));
             if (result.IsSuccess)
             {
-                return Ok(new {message = "You have borrowed successfully these book",borrowHistory = result});
+                return Ok(new { message = "You have borrowed successfully these book", borrowHistory = result.Value });
             }
             else
             {
                 var error = result.Errors.First();
                 if (error.Metadata.Count != 0)
                 {
-                    return BadRequest(new {message = error.Message, data = error.Metadata});
+                    return BadRequest(new { message = error.Message, data = error.Metadata });
                 }
                 else
                 {
-                    return BadRequest(new {message = error.Message});
+                    return BadRequest(new { message = error.Message });
                 }
             }
+        }
+        catch (ValidationException ex)
+        {
+            return  BadRequest(new { message = ex.Errors.Select(e => e.ErrorMessage).ToList() });
         }
         catch (Exception ex)
         {
@@ -73,19 +78,34 @@ public class BorrowController:ControllerBase
             var result =
                 await _mediator.Send(new ReturnBookCommand(userIdClaim, email, username, address, phoneNumber,
                     bookIds));
-            return Ok( new {message = "You have successfully request to return please wait for response", bookList = result });
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    message = "You have successfully request to return please wait for response",
+                    bookList = result.Value
+                });
+            }
+            else
+            {
+                var error = result.Errors.First();
+                if (error.Metadata.Count != 0)
+                {
+                    return BadRequest(new { message = error.Message, data = error.Metadata });
+                }
+                else
+                {
+                    return BadRequest(new { message = error.Message });
+                }
+            }
         }
-        catch (InvalidOperationException ex)
+        catch (ValidationException ex)
         {
-            return BadRequest(ex.Message);
-        }
-        catch (NotFoundDataException ex)
-        {
-            return BadRequest(ex.Message);
+            return BadRequest(new { message = ex.Errors.Select(e => e.ErrorMessage) });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new {message = ex.Message});
         }
     }
 }

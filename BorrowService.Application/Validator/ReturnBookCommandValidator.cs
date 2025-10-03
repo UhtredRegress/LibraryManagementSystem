@@ -15,7 +15,12 @@ public class ReturnBookCommandValidator : AbstractValidator<ReturnBookCommand>
             .NotNull().WithMessage("Email is required")
             .EmailAddress(EmailValidationMode.Net4xRegex).WithMessage("Email is not valid");
         RuleFor(x => x.Address).NotNull().WithMessage("Address is required");
-        RuleFor(x=> x.BookList)
-            .NotNull().WithMessage("BookList is required");
+        RuleFor(x => x.BookList)
+            .NotNull().WithMessage("BookList is required")
+            .Must(bookList =>
+            {
+                var bookSet = bookList.ToHashSet();
+                return bookSet.Count == bookList.Count();
+            }).WithMessage("You request to return duplicate books");
     }
 }

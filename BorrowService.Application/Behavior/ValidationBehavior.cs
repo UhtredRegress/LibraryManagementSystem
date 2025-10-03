@@ -29,6 +29,7 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             if (errors.Any())
             {
                 _logger.LogWarning("Validation failed for {RequestType}: {Errors}", typeof(TRequest).Name, errors.Select(x => x.ErrorMessage));
+                throw new ValidationException(errors);
             }
         }   
         

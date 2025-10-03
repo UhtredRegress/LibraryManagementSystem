@@ -92,8 +92,6 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
 builder.Services
-    .AddScoped<IIntegrationEventHandler<RequestReturnBookIntegratedEvent>, RequestReturnBookIntegrationEventHandler>();
-builder.Services
     .AddScoped<IIntegrationEventHandler<ConfirmBookReturnedIntegratedEvent>,
         ConfirmBookReturnedIntegrationEventHandler>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();

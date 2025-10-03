@@ -19,9 +19,6 @@ public class SubscribeHandlerService : BackgroundService
         _logger.LogInformation("Starting subscribe integration handler ");
         await _eventBus.SubscribeAsync<ConfirmBookReturnedIntegratedEvent, ConfirmBookReturnedIntegrationEventHandler>();
         await _eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>();
-        await _eventBus.SubscribeAsync<RequestReturnBookIntegratedEvent, RequestReturnBookIntegrationEventHandler>();
-        
-        await Task.Delay(Timeout.Infinite, stoppingToken);
     }
     
 }

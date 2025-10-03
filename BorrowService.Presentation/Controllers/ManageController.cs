@@ -25,11 +25,15 @@ public class ManageController : ControllerBase
         try
         {
             var result = await _mediator.Send(new ConfirmBookReturnedCommand(BorrowHistoryId: borrowHistoryId, UserId: userId ));
-            return Ok(new { message = "Successfully confirmed book returned", borrowHistory = result });
-        }
-        catch (InvalidDataException ex)
-        {
-            return BadRequest(new { message = ex.Message });
+            if (result.IsSuccess == true)
+            {
+                return Ok(new { message = "Successfully confirmed book returned", borrowHistory = result.Value });
+            }
+            else
+            {
+                var error =  result.Errors.First();
+                return BadRequest(new { message = error.Message });
+            }
         }
         catch (Exception ex)
         {

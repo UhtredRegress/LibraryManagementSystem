@@ -8,10 +8,10 @@ namespace BookService.Application.IntegrationEventHandler;
 
 public class ConfirmBookReturnedIntegrationEventHandler:IIntegrationEventHandler<ConfirmBookReturnedIntegratedEvent>
 {
-    private readonly ILogger<RequestReturnBookIntegrationEventHandler> _logger;
+    private readonly ILogger<ConfirmBookReturnedIntegrationEventHandler> _logger;
     private readonly IBookRepository _bookRepository;
 
-    public ConfirmBookReturnedIntegrationEventHandler(ILogger<RequestReturnBookIntegrationEventHandler> logger,
+    public ConfirmBookReturnedIntegrationEventHandler(ILogger<ConfirmBookReturnedIntegrationEventHandler> logger,
         IBookRepository bookRepository)
     {
         _logger = logger;
@@ -25,8 +25,7 @@ public class ConfirmBookReturnedIntegrationEventHandler:IIntegrationEventHandler
         {
             return;
         }
-        
-        foundBook.UpdateAvailability(Availability.Available);
+        foundBook.BookReturned();
         await _bookRepository.UpdateBookAsync(foundBook);
         _logger.LogInformation("ConfirmBookReturnedCommand received, finishing process");
     }

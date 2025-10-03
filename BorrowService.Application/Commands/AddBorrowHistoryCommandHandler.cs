@@ -1,4 +1,5 @@
 using BorrowService.Domain.Entity;
+using BorrowService.Domain.ValueObject;
 using BorrowService.Infrastructure;
 using BorrowService.Infrastructure.IRepository;
 using FluentResults;
@@ -26,29 +27,43 @@ public class AddBorrowHistoryCommandHandler: IRequestHandler<AddBorrowHistoryCom
         _eventBus = eventBus;
         _logger = logger;
     }
-    
-    public async Task<Result<IEnumerable<BorrowHistory>>> Handle(AddBorrowHistoryCommand request, CancellationToken cancellationToken)
+
+    public async Task<Result<IEnumerable<BorrowHistory>>> Handle(AddBorrowHistoryCommand request,
+        CancellationToken cancellationToken)
     {
 
         if (!int.TryParse(request.userId, out int id))
         {
             return Result.Fail(new Error("Invalid user id"));
         }
-        var foundBorrower = await _borrowerRepository.GetBorrowerByIdAsync(id) ?? 
-                            await _borrowerRepository.CreateBorrowerAsync(new Borrower(id: id, name: request.Name, phone: request.Phone, email: request.Email, address: request.Address));
-        
-        var historyBorrow = await _borrowHistoryRepository.GetBorrowHistoryFilteredAsync(book => book.Id == foundBorrower.Id && request.bookList.Contains(book.Id));
 
-        if (historyBorrow.Count() != 0)
+        var foundBorrower = await _borrowerRepository.GetBorrowerByIdAsync(id) ??
+                            await _borrowerRepository.CreateBorrowerAsync(new Borrower(id: id, name: request.Name,
+                                phone: request.Phone, email: request.Email, address: request.Address));
+
+        var historyBorrow =
+            await _borrowHistoryRepository.GetBorrowHistoryFilteredAsync(bh =>
+                bh.BorrowerId == foundBorrower.Id && bh.Status != BorrowStatus.Done && bh.ReturnDate == null);
+
+        var requestHistory = historyBorrow.Where(hb => request.bookList.Contains(hb.BookId)).ToList();
+        
+        if (requestHistory.Count + request.bookList.Count() > 10)
         {
-            return Result.Fail(new Error("There is already a borrow history for this book").WithMetadata("historyList", historyBorrow));
+            return Result.Fail(new Error($"You can only borrow at most 10 books and you have alreay borrow {requestHistory.Count} books"));
+        }
+        
+        var onLoanBooks = requestHistory.Where(hb => request.bookList.Contains(hb.BookId)).ToList();
+        
+        if (onLoanBooks.Count > 0)
+        {
+            return Result.Fail(new Error("There is already a borrow history for these book").WithMetadata("historyList", onLoanBooks));
         }
         
         var resultCheckBookRequest = await _grpcClient.RequestCheckExistedBook(request.bookList);
 
         if (resultCheckBookRequest == false)
         {
-            return Result.Fail(new Error("Book not found")); 
+            return Result.Fail(new Error("Book not found in the library")); 
         }
 
         var borrowHistoryList = new List<BorrowHistory>(); 

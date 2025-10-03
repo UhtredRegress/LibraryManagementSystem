@@ -34,11 +34,10 @@ public class BorrowHistory
         return this;
     }
 
-    public BorrowHistory UpdateReturnDate(int userId)
+    public void UpdateReturnInformation(int userId)
     {
         Status = BorrowStatus.Done;
         ReturnDate = DateTime.UtcNow;
         ReturnedConfirmBy = userId;
-        return this;
     }
 }

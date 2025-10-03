@@ -67,4 +67,9 @@ public class Book
     {
         Stock--;
     }
+
+    public void BookReturned()
+    {
+        Stock++;
+    }
 }
