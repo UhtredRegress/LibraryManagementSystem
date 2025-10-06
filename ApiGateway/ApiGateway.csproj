@@ -8,9 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="InfluxDB.Client" Version="4.19.0-dev.15190" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
         <PackageReference Include="MMLib.SwaggerForOcelot" Version="9.0.0" />
         <PackageReference Include="Ocelot" Version="24.0.1" />
+        <PackageReference Include="StackExchange.Redis" Version="2.9.25" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     </ItemGroup>
 

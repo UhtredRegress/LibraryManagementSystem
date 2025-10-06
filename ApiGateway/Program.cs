@@ -1,5 +1,7 @@
+using ApiGateway;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddOcelot(builder.Configuration);
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
+builder.Services.AddSingleton<IMetricService, MetricService>();
+builder.Services.AddHostedService<FlushWorker>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -25,6 +30,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<MetricCollectorMiddleware>();
 await app.UseOcelot();
 
 app.Run();
