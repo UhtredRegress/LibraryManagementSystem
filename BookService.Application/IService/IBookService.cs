@@ -1,5 +1,6 @@
 using BookService.Domain.Enum;
 using BookService.Domain.Model;
+using Microsoft.AspNetCore.Http;
 
 namespace BookService.Application.IService;
 
@@ -12,4 +13,6 @@ public interface IBookService
     Task<IEnumerable<Book>> GetBooksByAvailability(Availability availability);
     Task<IEnumerable<Book>> GetBooksByTitle(string title);
     Task<IEnumerable<Book>> UpdateRangeBooksAsync(IEnumerable<int> bookId);
+    Task<Book> AddFileForBook(Book book, IFormFile file);
+    Task<Book> AddFileForBookId(int id, IFormFile file);
 }

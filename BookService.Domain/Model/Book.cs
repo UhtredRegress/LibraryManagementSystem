@@ -28,6 +28,7 @@ public class Book
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
     public int Stock { get; private set; }
+    public string? FileName { get; private set; }
     
     public Book() {}
 
@@ -43,6 +44,7 @@ public class Book
         CreatedAt = DateTime.UtcNow;
         ModifiedAt = DateTime.UtcNow;
         Stock = stock;
+        FileName = null;
     }
     
     public void UpdateBook(Book book)
@@ -71,5 +73,10 @@ public class Book
     public void BookReturned()
     {
         Stock++;
+    }
+
+    public void AddFileToBook(string title)
+    {
+        FileName = title;
     }
 }

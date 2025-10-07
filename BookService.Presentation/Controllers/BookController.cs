@@ -20,12 +20,16 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddBook([FromBody] Book book)
+    public async Task<IActionResult> AddBook(BookAddDTO BookDto)
     {
         try
         {
-            var result = await _bookService.AddBookAsync(book);
-            return Ok(result);
+            var addedBook = await _bookService.AddBookAsync(BookDto.Book);
+            if (BookDto.File != null)
+            {
+                await _bookService.AddFileForBook(addedBook, BookDto.File);
+            }
+            return Ok();
         }
         catch (Exception e)
         {
@@ -116,6 +120,21 @@ public class BookController : ControllerBase
         catch (NotFoundDataException e)
         {
             return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpPost("upload/file/{id:int}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> AddFileForBook(int id,IFormFile file)
+    {
+        try
+        {
+            var result = await _bookService.AddFileForBookId(id, file);
+            return Ok(result);
         }
         catch (Exception e)
         {

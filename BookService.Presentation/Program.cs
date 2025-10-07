@@ -89,6 +89,8 @@ builder.WebHost.ConfigureKestrel(options =>
         listenOptions => listenOptions.Protocols = HttpProtocols.Http2); // gRPC or HTTPS if needed
 });
 
+builder.Services.Configure<MinioSettings>(builder.Configuration.GetSection("Minio"));
+
 
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
 builder.Services
@@ -100,6 +102,8 @@ builder.Services.AddAuthorization(options => options.AddPolicy("LibrarianNumeric
 {
     policy.Requirements.Add(new NumericRoleRequirement(roleRequirement: 2));
 }));
+
+builder.Services.AddScoped<IMinioService, MinioService>();
 
 builder.Services.AddGrpc();
 builder.Services.AddHostedService<SubscribeHandlerService>();
@@ -122,9 +126,6 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<BookServiceDbContext>();
     db.Database.Migrate();
 }
-
-//var eventBus = app.Services.GetRequiredService<IEventBus>();
-//await eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, UpdateBookIntegrationHandler>();
 
 app.UseAuthentication();
 app.UseAuthorization();

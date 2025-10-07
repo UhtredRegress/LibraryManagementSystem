@@ -2,6 +2,7 @@ using BookService.Application.IService;
 using BookService.Domain.Enum;
 using BookService.Domain.Model;
 using BookService.Infrastructure.Interface;
+using Microsoft.AspNetCore.Http;
 using Shared.Exception;
 
 namespace BookService.Application;
@@ -9,10 +10,11 @@ namespace BookService.Application;
 public class BookService : IBookService
 {
     private readonly IBookRepository _bookRepository;
-
-    public BookService(IBookRepository bookRepository)
+    private readonly IMinioService _minioService;
+    public BookService(IBookRepository bookRepository, IMinioService minioService)
     {
         _bookRepository = bookRepository;
+        _minioService = minioService;
     }
 
 
@@ -20,7 +22,7 @@ public class BookService : IBookService
     {
         Book addedBook = new Book(book.Title, book.Author, book.Stock, book.Availability, book.PublishDate, book.Description,
             book.Description);
-        
+           
         return await _bookRepository.AddBookAsync(addedBook);
     }
 
@@ -99,5 +101,30 @@ public class BookService : IBookService
         
         return foundBookList; 
     }
-    
+
+    public async Task<Book> AddFileForBook(Book book, IFormFile file)
+    {
+        await _minioService.UploadFileAsync(file, book.Id.ToString() + "_" + book.Title + "_" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
+        book.AddFileToBook(book.Id.ToString());
+        return await _bookRepository.UpdateBookAsync(book);
+    }
+
+    public async Task<Book> AddFileForBookId(int id, IFormFile file)
+    {
+        var foundBook = await _bookRepository.GetBookByIdAsync(id);
+
+        if (foundBook == null)
+        {
+            throw new NotFoundDataException("The book does not exist");
+        }
+
+        if (!string.IsNullOrEmpty(foundBook.FileName))
+        {
+            await _minioService.DeleteFileAsync(foundBook.FileName);
+        }
+        
+        await _minioService.UploadFileAsync(file, foundBook.Id.ToString() + "_" + foundBook.Title + "_" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
+        foundBook.AddFileToBook(foundBook.Id.ToString());
+        return await _bookRepository.UpdateBookAsync(foundBook);
+    }
 }
