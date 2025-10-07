@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices.ComTypes;
-
 namespace ApiGateway;
 
 public class FlushWorker : BackgroundService
@@ -16,9 +14,21 @@ public class FlushWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            await Task.Delay(300000, stoppingToken);
-            _logger.LogInformation("Flushing metrics start");
-            await _metricService.FlushMetrics();
+            try
+            {
+                if (_metricService.RedisContainsAnyData())
+                {
+                    _logger.LogInformation("Flushing metrics start");
+                    await _metricService.FlushMetrics();
+                }
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Flushing metrics failed");
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                _logger.LogInformation("Retry after 30 seconds");
+            }
         }
     }
 }

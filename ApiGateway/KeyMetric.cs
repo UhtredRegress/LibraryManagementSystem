@@ -1,5 +1,3 @@
-using StackExchange.Redis;
-
 namespace ApiGateway;
 
 public class KeyMetric
