@@ -20,9 +20,9 @@ public class BookRepository : IBookRepository
 
     public async Task<Book> AddBookAsync(Book book)
     {
-        await _context.Books.AddAsync(book);
+        var result = await _context.Books.AddAsync(book);
         await _context.SaveChangesAsync();
-        return book;
+        return result.Entity;
     }
 
     public async Task<Book> UpdateBookAsync(Book book)

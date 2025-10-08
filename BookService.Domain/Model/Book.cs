@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BookService.Domain.Enum;
 
+
 namespace BookService.Domain.Model;
 
 public class Book
@@ -13,9 +14,6 @@ public class Book
     public string? Title { get; set; }
     [Column("author")]
     public string? Author { get; set; }
-    [Required]
-    [Column("availabily")]
-    public Availability Availability { get; set; }
     public string Publisher { get; set; }
     [Column("description")]
     public string? Description { get; set; }
@@ -27,42 +25,54 @@ public class Book
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
-    public int Stock { get; private set; }
-    public string? FileName { get; private set; }
+    public BookType Type { get; private set; }
+    public string? FileAddress { get; private set; }
+    public int? Stock { get; private set; }
     
     public Book() {}
 
-    public Book(string title, string author, int stock, Availability availability, DateTime? publishDate, string description,
-        string publisher)
+    public Book(Book other)
     {
-        Title = title;
-        Author = author;
-        Availability = availability;
-        PublishDate = publishDate;
-        Description = description;
-        Publisher = publisher;
-        CreatedAt = DateTime.UtcNow;
-        ModifiedAt = DateTime.UtcNow;
-        Stock = stock;
-        FileName = null;
+        Id = other.Id;
+        Title = other.Title;
+        Author = other.Author;
+        Publisher = other.Publisher;
+        Description = other.Description;
+        PublishDate = other.PublishDate;
+        CreatedAt = other.CreatedAt;
+        ModifiedAt = other.ModifiedAt;
+        Type = other.Type;
+        FileAddress = other.FileAddress;
+        Stock = other.Stock;
     }
     
     public void UpdateBook(Book book)
     {
         Id = book.Id;
         Title = book.Title;
-        Availability = book.Availability;
         PublishDate = book.PublishDate;
         Description = book.Description;
         Publisher = book.Publisher;
         CreatedAt = book.CreatedAt;
         ModifiedAt = DateTime.UtcNow;
-        Stock = book.Stock;
     }
-    
-    public void UpdateAvailability(Availability availability)
+
+    public static Book CreateBook(string title, string author, string description, string publisher,
+        DateTime? publishedDate, BookType type, string? fileAddress = null, int? stock = null)
     {
-        Availability = availability;
+        var book = new Book();
+        book.Id = 0;
+        book.Title = title;
+        book.Author = author;
+        book.Publisher = publisher;
+        book.Description = description;
+        book.PublishDate = publishedDate;
+        book.FileAddress = fileAddress;
+        book.Stock = stock;
+        book.Type = type;
+        book.FileAddress = fileAddress;
+        book.Stock = stock;
+        return book;
     }
 
     public void BookBorrowed()
@@ -73,10 +83,5 @@ public class Book
     public void BookReturned()
     {
         Stock++;
-    }
-
-    public void AddFileToBook(string title)
-    {
-        FileName = title;
     }
 }

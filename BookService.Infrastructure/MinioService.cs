@@ -22,16 +22,6 @@ public class MinioService : IMinioService
     }
     public async Task UploadFileAsync(IFormFile file, string fileName)
     {
-        if (file == null || file.Length == 0)
-        {
-            throw new ArgumentNullException("Invalid file upload");
-        }
-
-        if (string.IsNullOrEmpty(fileName))
-        {
-            throw new ArgumentNullException("Invalid file name");
-        }
-        
         bool found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_minioSettings.Value.BucketName));
         if (!found)
         {

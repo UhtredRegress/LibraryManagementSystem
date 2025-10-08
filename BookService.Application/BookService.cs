@@ -18,12 +18,49 @@ public class BookService : IBookService
     }
 
 
-    public async Task<Book> AddBookAsync(Book book)
+    public async Task<Book> AddBookAsync(Book book, IFormFile file)
     {
-        Book addedBook = new Book(book.Title, book.Author, book.Stock, book.Availability, book.PublishDate, book.Description,
-            book.Description);
-           
-        return await _bookRepository.AddBookAsync(addedBook);
+        var typeCount = Enum.GetNames(typeof(BookType)).Length;
+        var maximumType = 1 << typeCount;
+        if (book.Title == null)
+        {
+            throw new InvalidDataException("Title is required.");
+        }
+        
+        if ((int)book.Type >= maximumType)
+        {
+            throw new InvalidDataException($"Book type {book.Type} is too high.");
+        }
+
+        if (book.Type <= 0)
+        {
+            throw new InvalidDataException($"Book type {book.Type} is negative.");
+        }
+
+        if (((int)book.Type & (int)BookType.Ebook) != 0)
+        {
+            if (file.Length <= 0 || file == null)
+            {
+                throw new InvalidDataException("Ebook file is empty to create"); 
+            }
+        }
+
+        if (((int)book.Type & (int)BookType.Physical) != 0)
+        {
+            if (book.Stock <= 0)
+            {
+                throw new InvalidDataException("Physical book require quantity in the system");
+            }
+        }
+        
+        var newBook = 
+            Book.CreateBook(title: book.Title, author: book.Author, description: book.Description, type: book.Type, publisher: book.Publisher, publishedDate: book.PublishDate, fileAddress: book.FileAddress, stock: book.Stock);
+
+        var savedBook = await _bookRepository.AddBookAsync(newBook);
+
+        var fileName = $"{savedBook.Id}_{savedBook.Title}_{savedBook.CreatedAt.ToString("yyyyMMddHHmmss")}";
+        await _minioService.UploadFileAsync(file, fileName);
+        return savedBook;
     }
 
     public async Task<Book> UpdateBookAsync(int id, Book book)
@@ -64,18 +101,6 @@ public class BookService : IBookService
         return resultList.ToList();
     }
 
-    public async Task<IEnumerable<Book>> GetBooksByAvailability(Availability availability)
-    {
-        var resultList = await _bookRepository.GetBooksFilteredAsync((book) => book.Availability == availability);
-
-        if (!resultList.Any())
-        {
-            throw new NotFoundDataException("There are no books with this availability");
-        }
-        
-        return resultList.ToList();
-    }
-
     public async Task<IEnumerable<Book>> GetBooksByTitle(string title)
     {
         var resultList = await _bookRepository.GetBooksFilteredAsync((book) => book.Title.StartsWith(title));
@@ -101,15 +126,9 @@ public class BookService : IBookService
         
         return foundBookList; 
     }
+    
 
-    public async Task<Book> AddFileForBook(Book book, IFormFile file)
-    {
-        await _minioService.UploadFileAsync(file, book.Id.ToString() + "_" + book.Title + "_" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
-        book.AddFileToBook(book.Id.ToString());
-        return await _bookRepository.UpdateBookAsync(book);
-    }
-
-    public async Task<Book> AddFileForBookId(int id, IFormFile file)
+    public async Task<Book> UpdateFileForBookId(int id, IFormFile file)
     {
         var foundBook = await _bookRepository.GetBookByIdAsync(id);
 
@@ -118,13 +137,18 @@ public class BookService : IBookService
             throw new NotFoundDataException("The book does not exist");
         }
 
-        if (!string.IsNullOrEmpty(foundBook.FileName))
+        if (((int)foundBook.Type & (int)BookType.Ebook) != 0)
         {
-            await _minioService.DeleteFileAsync(foundBook.FileName);
+            throw new InvalidDataException($"Book type {foundBook.Type} is not valid to update file");
         }
-        
-        await _minioService.UploadFileAsync(file, foundBook.Id.ToString() + "_" + foundBook.Title + "_" + DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
-        foundBook.AddFileToBook(foundBook.Id.ToString());
+        if (!string.IsNullOrEmpty(foundBook.FileAddress))
+        {
+            await _minioService.DeleteFileAsync(foundBook.FileAddress);
+        }
+
+        var fileName = foundBook.Id.ToString() + "_" + foundBook.Title + "_" +
+                       DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        await _minioService.UploadFileAsync(file, fileName);
         return await _bookRepository.UpdateBookAsync(foundBook);
     }
 }

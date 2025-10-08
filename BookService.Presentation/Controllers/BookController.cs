@@ -1,5 +1,4 @@
 using BookService.Application.IService;
-using BookService.Domain.Enum;
 using BookService.Domain.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +23,7 @@ public class BookController : ControllerBase
     {
         try
         {
-            var addedBook = await _bookService.AddBookAsync(BookDto.Book);
-            if (BookDto.File != null)
-            {
-                await _bookService.AddFileForBook(addedBook, BookDto.File);
-            }
+            var addedBook = await _bookService.AddBookAsync(BookDto.Book, BookDto.File);
             return Ok();
         }
         catch (Exception e)
@@ -91,23 +86,7 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpGet("/filter/availability")]
-    public async Task<IActionResult> GetBooksByAvailability(Availability availability)
-    {
-        try
-        {
-            var result = await _bookService.GetBooksByAvailability(availability);
-            return Ok(result);
-        }
-        catch (NotFoundDataException e)
-        {
-            return NotFound(e.Message);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-    }
+
 
     [HttpGet("/filter/title")]
     public async Task<IActionResult> GetBooksByTitle(string title)
@@ -129,11 +108,11 @@ public class BookController : ControllerBase
     
     [HttpPost("upload/file/{id:int}")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> AddFileForBook(int id,IFormFile file)
+    public async Task<IActionResult> AddFileForBook(int id, IFormFile file)
     {
         try
         {
-            var result = await _bookService.AddFileForBookId(id, file);
+            var result = await _bookService.UpdateFileForBookId(id, file);
             return Ok(result);
         }
         catch (Exception e)

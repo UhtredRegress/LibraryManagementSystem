@@ -12,7 +12,7 @@ public class BookServiceDbContext:DbContext
 
 
     public DbSet<Book> Books { get; set; }
- 
+    public DbSet<BookPrice> BookPrices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,4 +28,11 @@ public class BookServiceDbContext:DbContext
         modelBuilder.Entity<Book>(entity =>
             entity.Property(b => b.PublishDate).HasColumnType("date")
         );
+
+        modelBuilder.Entity<BookPrice>(entity =>
+            entity.Property(b => b.PriceUnit).HasColumnType("decimal(18,2)"));
+        
+        modelBuilder.Entity<BookPrice>().HasKey(price => new { price.BookId, price.BookType });
+
+
     }}

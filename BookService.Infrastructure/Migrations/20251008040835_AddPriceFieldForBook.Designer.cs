@@ -3,6 +3,7 @@ using System;
 using BookService.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.BookService.Infrastructure.Migrations
 {
     [DbContext(typeof(BookServiceDbContext))]
-    partial class BookServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251008040835_AddPriceFieldForBook")]
+    partial class AddPriceFieldForBook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,6 +38,10 @@ namespace LMS.BookService.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("author");
 
+                    b.Property<int>("Availability")
+                        .HasColumnType("integer")
+                        .HasColumnName("availabily");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("create_at");
@@ -43,12 +50,15 @@ namespace LMS.BookService.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<string>("FileAddress")
+                    b.Property<string>("FileName")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("modified_at");
+
+                    b.Property<decimal>("PricePerUnit")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("PublishDate")
                         .HasColumnType("date")
@@ -58,16 +68,13 @@ namespace LMS.BookService.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("Stock")
+                    b.Property<int>("Stock")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("title");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -78,22 +85,6 @@ namespace LMS.BookService.Infrastructure.Migrations
                     b.HasIndex("Title");
 
                     b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("BookService.Domain.Model.BookPrice", b =>
-                {
-                    b.Property<int>("BookId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("BookType")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("PriceUnit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("BookId", "BookType");
-
-                    b.ToTable("BookPrices");
                 });
 #pragma warning restore 612, 618
         }

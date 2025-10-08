@@ -90,6 +90,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Services.Configure<MinioSettings>(builder.Configuration.GetSection("Minio"));
+builder.Services.AddScoped<IBookPriceRepository, BookPriceRepository>();
 
 
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();

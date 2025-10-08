@@ -3,6 +3,7 @@ using System;
 using BookService.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LMS.BookService.Infrastructure.Migrations
 {
     [DbContext(typeof(BookServiceDbContext))]
-    partial class BookServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251008081122_AddTypeFieldForBook")]
+    partial class AddTypeFieldForBook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,22 +81,6 @@ namespace LMS.BookService.Infrastructure.Migrations
                     b.HasIndex("Title");
 
                     b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("BookService.Domain.Model.BookPrice", b =>
-                {
-                    b.Property<int>("BookId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("BookType")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("PriceUnit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("BookId", "BookType");
-
-                    b.ToTable("BookPrices");
                 });
 #pragma warning restore 612, 618
         }
