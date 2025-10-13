@@ -1,4 +1,5 @@
 using System.Text;
+using BookService.Application;
 using BookService.Application.IService;
 using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
@@ -81,6 +82,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
+builder.Services.AddScoped<IBookPriceRepository, BookPriceRepository>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -105,7 +107,7 @@ builder.Services.AddAuthorization(options => options.AddPolicy("LibrarianNumeric
 }));
 
 builder.Services.AddScoped<IMinioService, MinioService>();
-
+builder.Services.AddScoped<IBookPriceService, BookPriceService>();
 builder.Services.AddGrpc();
 builder.Services.AddHostedService<SubscribeHandlerService>();
 

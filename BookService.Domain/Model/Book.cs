@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BookService.Domain.Enum;
 
 
 namespace BookService.Domain.Model;
@@ -25,7 +24,7 @@ public class Book
     [Required]
     [Column("modified_at")]
     public DateTime ModifiedAt { get; set; }
-    public BookType Type { get; private set; }
+    public int Type { get; private set; }
     public string? FileAddress { get; private set; }
     public int? Stock { get; private set; }
     
@@ -58,7 +57,7 @@ public class Book
     }
 
     public static Book CreateBook(string title, string author, string description, string publisher,
-        DateTime? publishedDate, BookType type, string? fileAddress = null, int? stock = null)
+        DateTime? publishedDate, int type, string? fileAddress = null, int? stock = null)
     {
         var book = new Book();
         book.Id = 0;
@@ -83,5 +82,10 @@ public class Book
     public void BookReturned()
     {
         Stock++;
+    }
+
+    public void UpdateFileAddress(string fileAddress)
+    {
+        FileAddress = fileAddress;
     }
 }

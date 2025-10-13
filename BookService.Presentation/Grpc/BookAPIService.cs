@@ -1,4 +1,3 @@
-using BookService.Domain.Enum;
 using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
 using Grpc.Core;
@@ -13,7 +12,7 @@ public class BookAPIService : BookAPI.BookAPIBase
     private readonly IBookRepository _bookRepository;
     private readonly IBookPriceRepository _bookPriceRepository;
     
-    public BookAPIService(ILogger<BookAPIService> logger,  IBookRepository bookRepository, BookPriceRepository bookPriceRepository)
+    public BookAPIService(ILogger<BookAPIService> logger,  IBookRepository bookRepository, IBookPriceRepository bookPriceRepository)
     {
         _logger = logger;
         _bookRepository = bookRepository;
@@ -93,6 +92,7 @@ public class BookAPIService : BookAPI.BookAPIBase
         _logger.LogInformation("Received RetrieveBookPriceRequest in the Book service ");
         
         var foundBookPrice = await _bookPriceRepository.GetBookPriceFiltered(fb => fb.BookId == request.BookId && (int)fb.BookType == request.BookType);
+  
         var response = new RetrieveBookPriceResponse();
         
         if (foundBookPrice == null)
@@ -100,6 +100,8 @@ public class BookAPIService : BookAPI.BookAPIBase
             response.IsSuccess = false;
             return response;
         }
+        
+        
 
         var price = foundBookPrice.PriceUnit;
         var unit = (int)price;
@@ -107,10 +109,14 @@ public class BookAPIService : BookAPI.BookAPIBase
         var foundBook = await  _bookRepository.GetBookByIdAsync(request.BookId);
         
         response.IsSuccess = true;
-        response.Book.Title = foundBook.Title;
-        response.Book.Author = foundBook.Author;
-        response.Book.Publisher = foundBook.Publisher;
-        response.Book.PricePerUnit = new DecimalValue() {Units = unit, Micros = micro};
+        Book temp = new Book();
+        temp.BookId = foundBook.Id;
+        temp.Title = foundBook.Title;
+        temp.Author = foundBook.Author;
+        temp.Publisher = foundBook.Publisher;
+        temp.PricePerUnit = new DecimalValue() {Units = unit, Micros = micro};
+
+        response.Book = temp;
 
         return response;
     }

@@ -1,4 +1,4 @@
-namespace BookService.Domain.Enum;
+namespace Shared.Enum;
 
 public enum BookType
 {

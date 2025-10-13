@@ -8,7 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      
+      <Folder Include="Enum\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
 </Project>

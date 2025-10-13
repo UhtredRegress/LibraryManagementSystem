@@ -1,8 +1,8 @@
 namespace PurchaseService.Domain.Enum;
 
-public enum Status
+public enum PurchaseStatus
 {
     Pending,
     Approved,
-    Rejected,
+    Rejected
 }

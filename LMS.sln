@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchaseService.Domain", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchaseService.Infrastructure", "PurchaseService.Infrastructure\PurchaseService.Infrastructure.csproj", "{74981D16-7805-4F42-BD3A-ED7CD28E18F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurchaseService.Application", "PurchaseService.Application\PurchaseService.Application.csproj", "{7BA43015-1854-4A53-BA59-935C527D0E63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +128,10 @@ Global
 		{74981D16-7805-4F42-BD3A-ED7CD28E18F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74981D16-7805-4F42-BD3A-ED7CD28E18F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74981D16-7805-4F42-BD3A-ED7CD28E18F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA43015-1854-4A53-BA59-935C527D0E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BA43015-1854-4A53-BA59-935C527D0E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BA43015-1854-4A53-BA59-935C527D0E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BA43015-1854-4A53-BA59-935C527D0E63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

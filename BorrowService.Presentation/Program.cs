@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using RabbitMQ.Client;
 using RabbitMQEventBus;
 using System.Text;
 using BorrowkService.Presentation.Authorization;
@@ -14,6 +13,8 @@ using BorrowService.Application.Behavior;
 using BorrowService.Infrastructure.IRepository;
 using BorrowService.Presentation.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using RabbitMQ.Client;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -102,6 +103,11 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("status","Active");
     });
 });
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    return LazyConnection.Value;
+});
+
 builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
 
 var app = builder.Build();
@@ -129,3 +135,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+internal partial class Program()
+{
+    static readonly Lazy<IConnectionMultiplexer> LazyConnection = new (() => ConnectionMultiplexer.Connect("localhost:6379"));
+}
+
+    

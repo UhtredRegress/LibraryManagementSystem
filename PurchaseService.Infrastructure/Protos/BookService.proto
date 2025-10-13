@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option csharp_namespace = "Lirabry.Grpc";
+
+package BookAPI;
+
+// Request message
+message BookInfoRequest {
+  int32 book_id = 1;
+}
+
+// Response message
+message BookFoundResponse {
+  int32 book_id = 1;
+  string title = 2;
+  string publisher = 3;
+  string author = 4;
+  bool available = 5;
+}
+
+message DecimalValue {
+  int64 units = 1;
+  sfixed32 micros = 2;
+}
+
+message CheckExistedBookRequest {
+  repeated int32 book_id = 1;
+}
+
+message CheckExistedBookResponse {
+  bool result = 1;
+}
+
+message Book {
+	int32 book_id = 1;
+	string title = 2;
+	string publisher = 3;
+	string author = 4;
+  DecimalValue price_per_unit = 5;
+}
+
+message GetBookInfoRequest {
+	repeated int32 book_id = 1;
+}
+
+message GetBookInfoResponse {
+	repeated Book books = 1;
+}
+
+message RetrieveBookPriceRequest {
+  int32 book_id = 1;
+  int32 book_type = 2;
+}
+
+message RetrieveBookPriceResponse {
+  bool is_success = 1;
+  Book book = 2;
+}
+
+// gRPC service
+service BookAPI {
+  rpc FindBook (BookInfoRequest) returns (BookFoundResponse);
+  rpc CheckExist (CheckExistedBookRequest) returns (CheckExistedBookResponse);
+  rpc GetRangeBook (GetBookInfoRequest) returns (GetBookInfoResponse);
+  rpc RetrieveBookPrice (RetrieveBookPriceRequest) returns (RetrieveBookPriceResponse);
+}
+

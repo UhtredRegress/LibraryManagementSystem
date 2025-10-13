@@ -9,7 +9,7 @@ public class PurchaseDbContext:DbContext
     {
     }
     
-    public DbSet<PurchaseBook>  Purchases { get; set; }
+    public DbSet<PurchaseBook>  PurchaseBooks { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

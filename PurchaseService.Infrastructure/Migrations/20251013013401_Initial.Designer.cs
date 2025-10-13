@@ -12,7 +12,7 @@ using PurchaseService.Infrastructure;
 namespace PurchaseService.Infrastructure.Migrations
 {
     [DbContext(typeof(PurchaseDbContext))]
-    [Migration("20251008080555_Initial")]
+    [Migration("20251013013401_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -33,6 +33,9 @@ namespace PurchaseService.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasColumnType("text");
@@ -40,11 +43,17 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("BookType")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("FinalCost")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SessionUrl")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -62,7 +71,7 @@ namespace PurchaseService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Purchases");
+                    b.ToTable("PurchaseBooks");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
-using BookService.Infrastructure.Interface;
+using BookService.Application;
+using BookService.Application.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookService.Presentation.Controllers;
@@ -7,11 +8,11 @@ namespace BookService.Presentation.Controllers;
 [Route("api/prices")]
 public class BookPriceController : ControllerBase
 {
-    private readonly ;
+    private readonly IBookPriceService _bookPriceService;
 
-    public BookPriceController(IBookPriceRepository bookPriceRepository)
+    public BookPriceController(IBookPriceService bookPriceService)
     {
-        _bookPriceRepository = bookPriceRepository;
+        _bookPriceService = bookPriceService;
     }
 
     [HttpPost]
@@ -19,7 +20,12 @@ public class BookPriceController : ControllerBase
     {
         try
         {
-            
+            var bookPrice = await _bookPriceService.AddBookPriceAsync(bookPriceDto);
+            return Ok(bookPrice);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new {Error = ex.Message});
         }
     }
 }

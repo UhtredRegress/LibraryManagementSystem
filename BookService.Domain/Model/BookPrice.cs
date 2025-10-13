@@ -1,4 +1,4 @@
-using BookService.Domain.Enum;
+using Shared.Enum;
 
 namespace BookService.Domain.Model;
 

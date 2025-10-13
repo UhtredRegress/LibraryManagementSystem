@@ -1,4 +1,3 @@
-using BookService.Domain.Enum;
 using BookService.Domain.Model;
 using BookService.Infrastructure.Interface;
 using Microsoft.Extensions.Logging;

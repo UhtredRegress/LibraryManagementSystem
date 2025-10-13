@@ -1,7 +1,9 @@
+using BookService.Application;
 using BookService.Application.IService;
 using BookService.Domain.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Enum;
 using Shared.Exception;
 
 namespace BookService.Presentation.Controllers;
@@ -23,12 +25,17 @@ public class BookController : ControllerBase
     {
         try
         {
-            var addedBook = await _bookService.AddBookAsync(BookDto.Book, BookDto.File);
-            return Ok();
+            var addedBook = await _bookService.AddBookAsync(BookDto);
+
+            var resultAddDTO = new BookAddResultDTO(addedBook.Id, addedBook.Title, addedBook.Author,
+                addedBook.Publisher, stock: addedBook.Stock, fileAddress: addedBook.FileAddress,
+                type: addedBook.Type);
+
+            return Ok(resultAddDTO);
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new {Error = e.Message});
         }
     }
 
@@ -38,7 +45,7 @@ public class BookController : ControllerBase
         try
         {
             var result = await _bookService.UpdateBookAsync(id, book);
-            return Ok( new {Result = result});
+            return Ok(new { Result = result });
         }
         catch (NotFoundDataException e)
         {
@@ -82,11 +89,9 @@ public class BookController : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message); 
+            return BadRequest(e.Message);
         }
     }
-
-
 
     [HttpGet("/filter/title")]
     public async Task<IActionResult> GetBooksByTitle(string title)
@@ -105,9 +110,8 @@ public class BookController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpPost("upload/file/{id:int}")]
-    [Consumes("multipart/form-data")]
     public async Task<IActionResult> AddFileForBook(int id, IFormFile file)
     {
         try
@@ -119,5 +123,12 @@ public class BookController : ControllerBase
         {
             return BadRequest(e.Message);
         }
+    }
+
+    [HttpGet("types")]
+    public async Task<IActionResult> GetBookTypes()
+    {
+        var result = Enum.GetValues(typeof(BookType)).Cast<BookType>().Select(x => new BookTypeDTO((int)x, x.ToString()));
+        return Ok(result);
     }
 }

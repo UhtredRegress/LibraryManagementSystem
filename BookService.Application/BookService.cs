@@ -1,8 +1,9 @@
 using BookService.Application.IService;
-using BookService.Domain.Enum;
 using BookService.Domain.Model;
 using BookService.Infrastructure.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Shared.Enum;
 using Shared.Exception;
 
 namespace BookService.Application;
@@ -11,55 +12,64 @@ public class BookService : IBookService
 {
     private readonly IBookRepository _bookRepository;
     private readonly IMinioService _minioService;
-    public BookService(IBookRepository bookRepository, IMinioService minioService)
+    private readonly ILogger<BookService> _logger;
+    public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger)
     {
         _bookRepository = bookRepository;
         _minioService = minioService;
+        _logger = logger;
     }
 
 
-    public async Task<Book> AddBookAsync(Book book, IFormFile file)
+    public async Task<Book> AddBookAsync(BookAddDTO bookAddDTO)
     {
         var typeCount = Enum.GetNames(typeof(BookType)).Length;
         var maximumType = 1 << typeCount;
-        if (book.Title == null)
+        if (bookAddDTO.Title == null)
         {
             throw new InvalidDataException("Title is required.");
         }
+
+        if (bookAddDTO.Type <= 0)
+        {
+            throw new InvalidDataException("Book Type is required.");
+        }
         
-        if ((int)book.Type >= maximumType)
+        if (bookAddDTO.Type >= maximumType)
         {
-            throw new InvalidDataException($"Book type {book.Type} is too high.");
+            throw new InvalidDataException("Book type is not valid.");
         }
+        
 
-        if (book.Type <= 0)
+        if ((bookAddDTO.Type & (int)BookType.Physical) != 0)
         {
-            throw new InvalidDataException($"Book type {book.Type} is negative.");
-        }
-
-        if (((int)book.Type & (int)BookType.Ebook) != 0)
-        {
-            if (file.Length <= 0 || file == null)
-            {
-                throw new InvalidDataException("Ebook file is empty to create"); 
-            }
-        }
-
-        if (((int)book.Type & (int)BookType.Physical) != 0)
-        {
-            if (book.Stock <= 0)
+            if (bookAddDTO.Stock <= 0)
             {
                 throw new InvalidDataException("Physical book require quantity in the system");
             }
         }
         
+        if ((bookAddDTO.Type & (int)BookType.Ebook) != 0)
+        {
+            if (bookAddDTO.File == null || bookAddDTO.File.Length <= 0 )
+            {
+                throw new InvalidDataException("Ebook file is empty to create"); 
+            }
+        }
+        
         var newBook = 
-            Book.CreateBook(title: book.Title, author: book.Author, description: book.Description, type: book.Type, publisher: book.Publisher, publishedDate: book.PublishDate, fileAddress: book.FileAddress, stock: book.Stock);
+            Book.CreateBook(title: bookAddDTO.Title, author: bookAddDTO.Author, description: bookAddDTO.Description, type: bookAddDTO.Type, publisher: bookAddDTO.Publisher, publishedDate: bookAddDTO.PublishDate, stock: bookAddDTO.Stock);
 
         var savedBook = await _bookRepository.AddBookAsync(newBook);
 
-        var fileName = $"{savedBook.Id}_{savedBook.Title}_{savedBook.CreatedAt.ToString("yyyyMMddHHmmss")}";
-        await _minioService.UploadFileAsync(file, fileName);
+        if ((bookAddDTO.Type & (int)BookType.Ebook) != 0)
+        {
+            var fileName = $"{savedBook.Id}_{savedBook.Title}_{savedBook.CreatedAt.ToString("yyyyMMddHHmmss")}";
+            savedBook.UpdateFileAddress(fileName); 
+            await _minioService.UploadFileAsync(bookAddDTO.File, fileName);
+            return await _bookRepository.UpdateBookAsync(newBook);
+        }
+        
         return savedBook;
     }
 
@@ -137,18 +147,27 @@ public class BookService : IBookService
             throw new NotFoundDataException("The book does not exist");
         }
 
-        if (((int)foundBook.Type & (int)BookType.Ebook) != 0)
+        if (((int)foundBook.Type & (int)BookType.Ebook) == 0)
         {
             throw new InvalidDataException($"Book type {foundBook.Type} is not valid to update file");
         }
         if (!string.IsNullOrEmpty(foundBook.FileAddress))
         {
-            await _minioService.DeleteFileAsync(foundBook.FileAddress);
+            try
+            {
+                await _minioService.DeleteFileAsync(foundBook.FileAddress);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+            }
         }
 
         var fileName = foundBook.Id.ToString() + "_" + foundBook.Title + "_" +
                        DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        foundBook.UpdateFileAddress(fileName);
         await _minioService.UploadFileAsync(file, fileName);
         return await _bookRepository.UpdateBookAsync(foundBook);
     }
+    
 }
