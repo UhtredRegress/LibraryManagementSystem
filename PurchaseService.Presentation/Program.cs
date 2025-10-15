@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PurchaseService.Application;
 using PurchaseService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -98,5 +99,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<PurchaseBookGrpc>();
 
 app.Run();

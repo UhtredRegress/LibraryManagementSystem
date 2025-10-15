@@ -11,7 +11,7 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.32.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.33.0-rc2" />
         <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
         <PackageReference Include="Grpc.Tools" Version="2.72.0">
           <PrivateAssets>all</PrivateAssets>

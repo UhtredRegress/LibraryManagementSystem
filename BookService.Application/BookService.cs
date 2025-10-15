@@ -13,11 +13,13 @@ public class BookService : IBookService
     private readonly IBookRepository _bookRepository;
     private readonly IMinioService _minioService;
     private readonly ILogger<BookService> _logger;
-    public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger)
+    private readonly IRepository<Author> _authorRepository;
+    public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger, IRepository<Author> authorRepository)
     {
         _bookRepository = bookRepository;
         _minioService = minioService;
         _logger = logger;
+        _authorRepository = authorRepository;
     }
 
 
@@ -57,8 +59,10 @@ public class BookService : IBookService
             }
         }
         
+        var foundAuthor = await _authorRepository.GetRangeFilterAsync(a => bookAddDTO.Author.Contains(a.Id));
+        
         var newBook = 
-            Book.CreateBook(title: bookAddDTO.Title, author: bookAddDTO.Author, description: bookAddDTO.Description, type: bookAddDTO.Type, publisher: bookAddDTO.Publisher, publishedDate: bookAddDTO.PublishDate, stock: bookAddDTO.Stock);
+            Book.CreateBook(title: bookAddDTO.Title, authors: foundAuthor, description: bookAddDTO.Description, type: bookAddDTO.Type, publisher: bookAddDTO.Publisher, publishedDate: bookAddDTO.PublishDate, stock: bookAddDTO.Stock);
 
         var savedBook = await _bookRepository.AddBookAsync(newBook);
 

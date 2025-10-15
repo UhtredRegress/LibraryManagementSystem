@@ -9,7 +9,8 @@ public class BookServiceDbContext:DbContext
     public BookServiceDbContext(DbContextOptions<BookServiceDbContext> options) : base(options)
     {
     }
-
+    
+    
 
     public DbSet<Book> Books { get; set; }
     public DbSet<BookPrice> BookPrices { get; set; }
@@ -20,8 +21,6 @@ public class BookServiceDbContext:DbContext
         
         modelBuilder.Entity<Book>()
             .HasIndex(b => b.Title);
-        modelBuilder.Entity<Book>()
-            .HasIndex(b => b.Author);
         modelBuilder.Entity<Book>()
             .HasIndex(b => b.PublishDate);
         

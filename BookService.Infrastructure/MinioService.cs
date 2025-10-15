@@ -48,4 +48,14 @@ public class MinioService : IMinioService
         
         await _minioClient.RemoveObjectAsync(new RemoveObjectArgs().WithBucket(_minioSettings.Value.BucketName).WithObject(fileName));
     }
+
+    public async Task<string> CreatePreSignedUrlAsync(string objectName)
+    {
+        var getPresignedObjectUrlArgs = new PresignedGetObjectArgs()
+            .WithBucket(_minioSettings.Value.BucketName)
+            .WithObject(objectName)
+            .WithExpiry(60 * 10);
+
+        return await _minioClient.PresignedGetObjectAsync(getPresignedObjectUrlArgs);
+    }
 }

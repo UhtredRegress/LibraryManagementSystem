@@ -6,4 +6,5 @@ public interface IMinioService
 {
     Task UploadFileAsync(IFormFile file, string fileName);
     Task DeleteFileAsync(string fileName);
+    Task<string> CreatePreSignedUrlAsync(string objectName);
 }

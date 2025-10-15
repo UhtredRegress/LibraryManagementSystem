@@ -6,6 +6,7 @@ using BookService.Infrastructure.Interface;
 using BookService.Presentation.Authorization;
 using BookService.Presentation.Grpc;
 using BookService.Application.IntegrationEventHandler;
+using BookService.Domain.Model;
 using BookService.Presentation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RabbitMQEventBus;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,8 +95,6 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.Configure<MinioSettings>(builder.Configuration.GetSection("Minio"));
 builder.Services.AddScoped<IBookPriceRepository, BookPriceRepository>();
-
-
 builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
 builder.Services
     .AddScoped<IIntegrationEventHandler<ConfirmBookReturnedIntegratedEvent>,
@@ -110,6 +110,10 @@ builder.Services.AddScoped<IMinioService, MinioService>();
 builder.Services.AddScoped<IBookPriceService, BookPriceService>();
 builder.Services.AddGrpc();
 builder.Services.AddHostedService<SubscribeHandlerService>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(BookService.Application.AssemblyMarker).Assembly));
+builder.Services.AddScoped<IGrpcClient, GrpcClient>();
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
+builder.Services.AddScoped<IRepository<Author>, AuthorRepository>();
 
 var app = builder.Build();
 

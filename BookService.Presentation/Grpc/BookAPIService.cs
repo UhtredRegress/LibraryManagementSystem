@@ -31,7 +31,6 @@ public class BookAPIService : BookAPI.BookAPIBase
             throw new RpcException(new Status(StatusCode.NotFound, "Book not found"));
         }
         result.BookId = bookFound.Id;
-        result.Author = bookFound.Author;
         result.Publisher = bookFound.Publisher;
         result.Title = bookFound.Title;
 
@@ -77,7 +76,6 @@ public class BookAPIService : BookAPI.BookAPIBase
             var responseBook = new Book();
             responseBook.BookId = foundBook.Id;
             responseBook.Title = foundBook.Title;
-            responseBook.Author = foundBook.Author;
             responseBook.Publisher = foundBook.Publisher;
             response.Books.Add(responseBook); 
         }
@@ -112,7 +110,6 @@ public class BookAPIService : BookAPI.BookAPIBase
         Book temp = new Book();
         temp.BookId = foundBook.Id;
         temp.Title = foundBook.Title;
-        temp.Author = foundBook.Author;
         temp.Publisher = foundBook.Publisher;
         temp.PricePerUnit = new DecimalValue() {Units = unit, Micros = micro};
 

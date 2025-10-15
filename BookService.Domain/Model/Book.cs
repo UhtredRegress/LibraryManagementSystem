@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace BookService.Domain.Model;
 
 public class Book
@@ -11,8 +10,7 @@ public class Book
     [Required]
     [Column("title")]
     public string? Title { get; set; }
-    [Column("author")]
-    public string? Author { get; set; }
+    public ICollection<Author> Authors { get; private set; } = new List<Author>();
     public string Publisher { get; set; }
     [Column("description")]
     public string? Description { get; set; }
@@ -34,7 +32,7 @@ public class Book
     {
         Id = other.Id;
         Title = other.Title;
-        Author = other.Author;
+        Authors = other.Authors;
         Publisher = other.Publisher;
         Description = other.Description;
         PublishDate = other.PublishDate;
@@ -56,13 +54,12 @@ public class Book
         ModifiedAt = DateTime.UtcNow;
     }
 
-    public static Book CreateBook(string title, string author, string description, string publisher,
+    public static Book CreateBook(string title, IEnumerable<Author> authors, string description, string publisher,
         DateTime? publishedDate, int type, string? fileAddress = null, int? stock = null)
     {
         var book = new Book();
         book.Id = 0;
         book.Title = title;
-        book.Author = author;
         book.Publisher = publisher;
         book.Description = description;
         book.PublishDate = publishedDate;
@@ -71,6 +68,10 @@ public class Book
         book.Type = type;
         book.FileAddress = fileAddress;
         book.Stock = stock;
+        foreach (var author in authors)
+        {
+            book.Authors.Add(author);
+        }
         return book;
     }
 
@@ -87,5 +88,14 @@ public class Book
     public void UpdateFileAddress(string fileAddress)
     {
         FileAddress = fileAddress;
+    }
+
+    public void AddAuthor(Author author)
+    {
+        if (Authors.Contains(author))
+        {
+            return;
+        }
+        Authors.Add(author);
     }
 }
