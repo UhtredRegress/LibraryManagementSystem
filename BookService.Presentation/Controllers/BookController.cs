@@ -27,7 +27,7 @@ public class BookController : ControllerBase
         {
             var addedBook = await _bookService.AddBookAsync(BookDto);
 
-            var resultAddDTO = new BookAddResultDTO(addedBook.Id, addedBook.Title, addedBook.Authors,
+            var resultAddDTO = new BookResultDTO(addedBook.Id, addedBook.Title, addedBook.Authors,
                 addedBook.Publisher, stock: addedBook.Stock, fileAddress: addedBook.FileAddress,
                 type: addedBook.Type);
 
@@ -40,7 +40,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPut("/update/{id}")]
-    public async Task<IActionResult> UpdateBook(int id, Book book)
+    public async Task<IActionResult> UpdateBook([FromRoute]int id,[FromForm] BookUpdateInformationDTO book)
     {
         try
         {
@@ -130,5 +130,19 @@ public class BookController : ControllerBase
     {
         var result = Enum.GetValues(typeof(BookType)).Cast<BookType>().Select(x => new BookTypeDTO((int)x, x.ToString()));
         return Ok(result);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetBookById(int id)
+    {
+        try
+        {
+            var result = await _bookService.GetBookById(id);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

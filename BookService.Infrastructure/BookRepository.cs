@@ -15,7 +15,7 @@ public class BookRepository : IBookRepository
     }
     public async Task<Book> GetBookByIdAsync(int id)
     {
-        return await _context.Books.FirstOrDefaultAsync(b => b.Id == id); 
+        return await _context.Books.Include(b => b.Authors).FirstOrDefaultAsync(b => b.Id == id); 
     }
 
     public async Task<Book> AddBookAsync(Book book)
@@ -37,11 +37,12 @@ public class BookRepository : IBookRepository
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
         return book;
-    }
+    }   
 
     public async Task<IEnumerable<Book>> GetBooksFilteredAsync(Expression<Func<Book, bool>> expression)
     {
-        return await _context.Books.Where(expression).ToListAsync();
+        return await _context.Books
+            .Where(expression).ToListAsync();
     }
 
     public async Task<IEnumerable<Book>> GetRangeBookByIdAsync(IEnumerable<int> bookIds)

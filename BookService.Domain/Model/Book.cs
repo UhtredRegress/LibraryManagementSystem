@@ -9,7 +9,7 @@ public class Book
     public int Id { get; set; }
     [Required]
     [Column("title")]
-    public string? Title { get; set; }
+    public string Title { get; set; }
     public ICollection<Author> Authors { get; private set; } = new List<Author>();
     public string Publisher { get; set; }
     [Column("description")]
@@ -98,4 +98,15 @@ public class Book
         }
         Authors.Add(author);
     }
+
+    public void UpdateInformationBook(string title, string publisher, string description, DateTime? publishDate,
+        IEnumerable<Author> authors)
+    {
+        Title = title;
+        Publisher = publisher;
+        Description = description;
+        PublishDate = publishDate;
+        Authors = authors.ToList();
+    }
+    
 }

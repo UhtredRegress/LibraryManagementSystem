@@ -99,7 +99,6 @@ public class BookAPIService : BookAPI.BookAPIBase
             return response;
         }
         
-        
 
         var price = foundBookPrice.PriceUnit;
         var unit = (int)price;

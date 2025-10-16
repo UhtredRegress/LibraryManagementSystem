@@ -12,4 +12,14 @@ public class Author : Entity
     {
         Name = name;
     }
+
+    public Author(string name)
+    {
+        Name = name;
+    }
+
+    public void UpdateName(string name)
+    {
+        Name = name;
+    }
 }

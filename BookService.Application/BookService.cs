@@ -1,5 +1,6 @@
 using BookService.Application.IService;
 using BookService.Domain.Model;
+using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -13,8 +14,8 @@ public class BookService : IBookService
     private readonly IBookRepository _bookRepository;
     private readonly IMinioService _minioService;
     private readonly ILogger<BookService> _logger;
-    private readonly IRepository<Author> _authorRepository;
-    public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger, IRepository<Author> authorRepository)
+    private readonly IAuthorRepository _authorRepository;
+    public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger, IAuthorRepository authorRepository)
     {
         _bookRepository = bookRepository;
         _minioService = minioService;
@@ -58,8 +59,15 @@ public class BookService : IBookService
                 throw new InvalidDataException("Ebook file is empty to create"); 
             }
         }
-        
+
+        _logger.LogInformation("Retrieve all the author of the book in the request");
         var foundAuthor = await _authorRepository.GetRangeFilterAsync(a => bookAddDTO.Author.Contains(a.Id));
+
+        if (foundAuthor.Count() < bookAddDTO.Author.Count())
+        {
+            _logger.LogError("There are author in the request that not exist in database ");
+            throw new InvalidDataException("Author does not exist in database");
+        }
         
         var newBook = 
             Book.CreateBook(title: bookAddDTO.Title, authors: foundAuthor, description: bookAddDTO.Description, type: bookAddDTO.Type, publisher: bookAddDTO.Publisher, publishedDate: bookAddDTO.PublishDate, stock: bookAddDTO.Stock);
@@ -77,18 +85,33 @@ public class BookService : IBookService
         return savedBook;
     }
 
-    public async Task<Book> UpdateBookAsync(int id, Book book)
+    public async Task<BookResultDTO> UpdateBookAsync(int id, BookUpdateInformationDTO book)
     {
+        _logger.LogInformation("Started handle request to update the book id {BookId}", id);
+        
+        _logger.LogInformation("Find book id {BookId} in the database", id);
         var foundBook = await _bookRepository.GetBookByIdAsync(id);
-
+        
         if (foundBook == null)
         {
+            _logger.LogError("Book with id {BookId} not found in the database", id);
             throw new NotFoundDataException("The book does not exist");
         }
-
-        foundBook.UpdateBook(book); 
         
-        return await _bookRepository.UpdateBookAsync(foundBook);
+        _logger.LogInformation("Retrieve all the author of the book in the request");
+        var foundAuthor = await _authorRepository.GetRangeFilterAsync(a => book.Author.Contains(a.Id));
+
+        if (foundAuthor.Count() < book.Author.Count())
+        {
+            _logger.LogError("There are author in the request that not exist in database ");
+            throw new InvalidDataException("There are author does not exist in database");
+        }
+        
+        _logger.LogInformation("Started update information in the database");
+        foundBook.UpdateInformationBook(book.Title, book.Publisher, book.Description, book.PublishDate, foundAuthor); 
+        await _bookRepository.UpdateBookAsync(foundBook);
+        return new BookResultDTO(foundBook.Id, foundBook.Title, foundBook.Authors, foundBook.Publisher, foundBook.Type, foundBook.Stock, foundBook.FileAddress );
+        
     }
 
     public async Task<Book> DeleteBookAsync(int id)
@@ -173,5 +196,15 @@ public class BookService : IBookService
         await _minioService.UploadFileAsync(file, fileName);
         return await _bookRepository.UpdateBookAsync(foundBook);
     }
-    
+
+    public async Task<BookResultDTO> GetBookById(int id)
+    {
+        var foundBook = await _bookRepository.GetBookByIdAsync(id);
+        if (foundBook == null)
+        {
+            throw new NotFoundDataException("The book does not exist");
+        }
+
+        return new BookResultDTO(foundBook.Id, foundBook.Title, foundBook.Authors, foundBook.Publisher, foundBook.Type, foundBook.Stock, foundBook.FileAddress);
+    }
 }

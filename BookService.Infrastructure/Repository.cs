@@ -46,4 +46,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         return await _dbSet.Where(filter).ToListAsync();
     }
+
+    public async Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> filter)
+    {
+        return await _dbSet.FirstOrDefaultAsync(filter);
+    }
 }

@@ -1,13 +1,14 @@
 using System.Text;
 using BookService.Application;
+using BookService.Application.IntegrationEventHandler;
 using BookService.Application.IService;
 using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
+using BookService.Presentation;
 using BookService.Presentation.Authorization;
 using BookService.Presentation.Grpc;
-using BookService.Application.IntegrationEventHandler;
-using BookService.Domain.Model;
-using BookService.Presentation;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -25,7 +26,8 @@ builder.Services.AddScoped<IBookService, BookService.Application.BookService>();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddDbContext<BookServiceDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<BookServiceDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
@@ -50,13 +52,13 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            new string[] { }
         }
     });
 });
 builder.Configuration
-    .AddJsonFile(@"D:\Code\Project\LibraryManagementSystem\dev-secrets\appsettings.shared.json", optional: true);
-    
+    .AddJsonFile(@"D:\Code\Project\LibraryManagementSystem\dev-secrets\appsettings.shared.json", true);
+
 //Add JWT Bearer
 builder.Services.AddAuthentication(options =>
     {
@@ -73,14 +75,14 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("StudentNumericRolePolicy", policy =>
-        policy.Requirements.Add(new NumericRoleRequirement(roleRequirement: 2)));
+        policy.Requirements.Add(new NumericRoleRequirement(2)));
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
@@ -95,25 +97,27 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.Configure<MinioSettings>(builder.Configuration.GetSection("Minio"));
 builder.Services.AddScoped<IBookPriceRepository, BookPriceRepository>();
-builder.Services.AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>,UpdateBookIntegrationHandler>();
+builder.Services
+    .AddScoped<IIntegrationEventHandler<BorrowHistoryCreatedIntegratedEvent>, UpdateBookIntegrationHandler>();
 builder.Services
     .AddScoped<IIntegrationEventHandler<ConfirmBookReturnedIntegratedEvent>,
         ConfirmBookReturnedIntegrationEventHandler>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
-builder.Services.AddAuthorization(options => options.AddPolicy("LibrarianNumericRolePolicy", policy =>
-{
-    policy.Requirements.Add(new NumericRoleRequirement(roleRequirement: 2));
-}));
+builder.Services.AddAuthorization(options => options.AddPolicy("LibrarianNumericRolePolicy",
+    policy => { policy.Requirements.Add(new NumericRoleRequirement(2)); }));
 
 builder.Services.AddScoped<IMinioService, MinioService>();
 builder.Services.AddScoped<IBookPriceService, BookPriceService>();
 builder.Services.AddGrpc();
 builder.Services.AddHostedService<SubscribeHandlerService>();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(BookService.Application.AssemblyMarker).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AssemblyMarker).Assembly));
 builder.Services.AddScoped<IGrpcClient, GrpcClient>();
-builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
-builder.Services.AddScoped<IRepository<Author>, AuthorRepository>();
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddValidatorsFromAssemblyContaining(typeof(AssemblyMarker));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 var app = builder.Build();
 
@@ -125,7 +129,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty;  
+    c.RoutePrefix = string.Empty;
 });
 
 using (var scope = app.Services.CreateScope())
