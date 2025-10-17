@@ -12,6 +12,6 @@ public class UpdateAuthorCommandValidator : AbstractValidator<UpdateAuthorComman
             .Must(i => i > 0).WithMessage("Id must be greater than zero");
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name cannot be empty")
-            .Matches(@"^[a-zA-Z\s]*$").WithMessage("Name must contain only alphabet characters");
+            .Matches(@"^[a-zA-Z\s.']*$").WithMessage("Name must contain only alphabet characters");
     }
 }

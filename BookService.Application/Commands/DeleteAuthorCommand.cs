@@ -26,7 +26,7 @@ public class DeleteAuthorCommandHandler : IRequestHandler<DeleteAuthorCommand, b
 
         if (author == null)
         {
-            _logger.LogError("There is no author with id {id} in database", request.id);
+            _logger.LogInformation("There is no author with id {id} in database", request.id);
             return false;
         }
         

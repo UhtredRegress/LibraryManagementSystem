@@ -11,6 +11,7 @@ public class Book
     [Column("title")]
     public string Title { get; set; }
     public ICollection<Author> Authors { get; private set; } = new List<Author>();
+    public ICollection<BookCategory> BookCategories { get; private set; } = new List<BookCategory>();
     public string Publisher { get; set; }
     [Column("description")]
     public string? Description { get; set; }
@@ -55,7 +56,7 @@ public class Book
     }
 
     public static Book CreateBook(string title, IEnumerable<Author> authors, string description, string publisher,
-        DateTime? publishedDate, int type, string? fileAddress = null, int? stock = null)
+        DateTime? publishedDate, int type, IEnumerable<Category> categories, string? fileAddress = null, int? stock = null)
     {
         var book = new Book();
         book.Id = 0;
@@ -66,11 +67,15 @@ public class Book
         book.FileAddress = fileAddress;
         book.Stock = stock;
         book.Type = type;
-        book.FileAddress = fileAddress;
         book.Stock = stock;
         foreach (var author in authors)
         {
             book.Authors.Add(author);
+        }
+
+        foreach (var category in categories)
+        {
+            book.BookCategories.Add(new BookCategory(book, category));
         }
         return book;
     }
@@ -100,13 +105,18 @@ public class Book
     }
 
     public void UpdateInformationBook(string title, string publisher, string description, DateTime? publishDate,
-        IEnumerable<Author> authors)
+        IEnumerable<Author> authors, IEnumerable<Category> categories)
     {
         Title = title;
         Publisher = publisher;
         Description = description;
         PublishDate = publishDate;
         Authors = authors.ToList();
+        BookCategories = new List<BookCategory>();
+        foreach (var category in categories)
+        {
+            BookCategories.Add(new BookCategory(this, category));
+        }
     }
     
 }

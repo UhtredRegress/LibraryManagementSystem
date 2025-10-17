@@ -13,9 +13,11 @@ public class BookRepository : IBookRepository
     {
         _context = context;
     }
+
     public async Task<Book> GetBookByIdAsync(int id)
     {
-        return await _context.Books.Include(b => b.Authors).FirstOrDefaultAsync(b => b.Id == id); 
+        return await _context.Books.Include(b => b.Authors).Include(b => b.BookCategories)
+            .FirstOrDefaultAsync(b => b.Id == id);
     }
 
     public async Task<Book> AddBookAsync(Book book)
@@ -37,7 +39,7 @@ public class BookRepository : IBookRepository
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
         return book;
-    }   
+    }
 
     public async Task<IEnumerable<Book>> GetBooksFilteredAsync(Expression<Func<Book, bool>> expression)
     {
@@ -48,6 +50,18 @@ public class BookRepository : IBookRepository
     public async Task<IEnumerable<Book>> GetRangeBookByIdAsync(IEnumerable<int> bookIds)
     {
         return await _context.Books.Where(book => bookIds.Contains(book.Id)).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorIds, int start, int number)
+    {
+        return  await _context.Books.AsNoTracking()
+            .Where(book => book.Authors.Any(author => author.Id == authorIds))
+            .Include(book => book.BookCategories).ThenInclude(bookCategory => bookCategory.Category)
+            .Include(book => book.Authors)
+            .OrderBy(book => book.Id)
+            .Skip(start)
+            .Take(number)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Book>> UpdateRangeBookAsync(IEnumerable<Book> books)

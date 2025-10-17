@@ -27,7 +27,7 @@ public class BookController : ControllerBase
         {
             var addedBook = await _bookService.AddBookAsync(BookDto);
 
-            var resultAddDTO = new BookResultDTO(addedBook.Id, addedBook.Title, addedBook.Authors,
+            var resultAddDTO = new BookResultDTO(addedBook.Id, addedBook.Title, addedBook.Authors, addedBook.BookCategories,
                 addedBook.Publisher, stock: addedBook.Stock, fileAddress: addedBook.FileAddress,
                 type: addedBook.Type);
 

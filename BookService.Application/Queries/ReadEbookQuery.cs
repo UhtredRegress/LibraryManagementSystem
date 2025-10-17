@@ -16,7 +16,6 @@ public class ReadEbookQueryHandler : IRequestHandler<ReadEbookQuery, Result<stri
     private readonly IGrpcClient _grpcClient;
     private readonly IDatabase _db;
     private readonly IMinioService _minioService;
-    
     public ReadEbookQueryHandler(ILogger<ReadEbookQueryHandler> logger, IBookRepository bookRepository, IConnectionMultiplexer connectionMultiplexer, IGrpcClient grpcClient, IMinioService minioService)
     {
         _bookRepository = bookRepository;

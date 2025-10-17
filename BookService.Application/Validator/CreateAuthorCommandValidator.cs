@@ -9,6 +9,6 @@ public class CreateAuthorCommandValidator : AbstractValidator<CreateAuthorComman
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required")
-            .Matches(@"^[a-zA-Z\s]*$").WithMessage("Name must contain only alphabet characters");
+            .Matches(@"^[a-zA-Z\s.']*$").WithMessage("Name must contain only alphabet characters");
     }
 }

@@ -22,7 +22,7 @@ public class DeleteRoleCommandHandler : IRequestHandler<DeleteRoleCommand, bool>
         var foundRole = await _roleRepository.GetRoleByIdAsync(request.RoleId);
         if (foundRole is null)
         {
-            _logger.LogError($"No role found with id {request.RoleId}");
+            _logger.LogInformation($"No role found with id {request.RoleId}");
             return false;
         }
         

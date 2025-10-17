@@ -31,16 +31,17 @@ public class SuccessfullyPurchaseBookCommandHandler : IRequestHandler<Successful
         var foundPurchase = await _purchaseRepository.GetPurchaseBookAsync(purchaseId);
         if (foundPurchase == null)
         {
-            _logger.LogError($"Could not find purchase with id: {purchaseId}");
+            _logger.LogInformation($"Could not find purchase with id: {purchaseId}");
             throw new NotFoundDataException("Not found purchase id");
         }
 
         if (foundPurchase.Status != PurchaseStatus.Pending)
         {
-            _logger.LogError("Cannot update purchase {purchaseId}", purchaseId);
+            _logger.LogInformation("Cannot update purchase {purchaseId}", purchaseId);
             throw new InvalidDataException("Cannot update purchase status");
         }
-
+        
+        _logger.LogInformation("Start update domain and update to database");
         foundPurchase.PurchaseSuccessfully();
         await _purchaseRepository.UpdatePurchaseBookAsync(foundPurchase);
     }

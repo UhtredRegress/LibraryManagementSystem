@@ -27,13 +27,13 @@ public class UpdateAuthorCommandHandler : IRequestHandler<UpdateAuthorCommand, R
         var foundAuthor = await _authorRepository.GetByIdAsync(request.Id);
         if (foundAuthor == null)
         {
-            _logger.LogError("Author with id {AuthorId} not found returned failed to user", request.Id);
+            _logger.LogInformation("Author with id {AuthorId} not found returned failed to user", request.Id);
             return Result.Fail(new Error("Author of your request is not found"));
         }
 
         if (foundAuthor.Name == request.Name)
         {
-            _logger.LogError("Name of the request to update author is identical with the old name");
+            _logger.LogInformation("Name of the request to update author is identical with the old name");
             return Result.Fail(new Error("You request to update name same as the old name"));
         }
         
@@ -41,7 +41,7 @@ public class UpdateAuthorCommandHandler : IRequestHandler<UpdateAuthorCommand, R
         var foundAuthorWithName = await _authorRepository.FindAsync(a => a.Name == request.Name);
         if (foundAuthorWithName != null)
         {
-            _logger.LogError("The request name is already existed in database");
+            _logger.LogInformation("The request name is already existed in database");
             return Result.Fail(new Error("Your request update name is already existed in database"));
         }    
         

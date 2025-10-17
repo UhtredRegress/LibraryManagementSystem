@@ -27,7 +27,7 @@ public class BookAPIService : BookAPI.BookAPIBase
 
         if (bookFound == null)
         {
-            _logger.LogError("Book not found");
+            _logger.LogInformation("Book not found");
             throw new RpcException(new Status(StatusCode.NotFound, "Book not found"));
         }
         result.BookId = bookFound.Id;
@@ -48,7 +48,7 @@ public class BookAPIService : BookAPI.BookAPIBase
 
         if (foundBookList.Count() != BookIdList.Count)
         {
-            _logger.LogError("There are book not found in the database ");
+            _logger.LogInformation("There are book not found in the database ");
             return new CheckExistedBookResponse() { Result = false };
         }
 
@@ -56,7 +56,7 @@ public class BookAPIService : BookAPI.BookAPIBase
         {
             if (bookItem.Stock <= 0)
             {
-                _logger.LogError("Books are not available in the library");
+                _logger.LogInformation("Books are not available in the library");
                 return new CheckExistedBookResponse() { Result = false };
             }
         }

@@ -13,4 +13,5 @@ public interface IBookRepository
     Task<Book> DeleteBook(Book book);
     Task<IEnumerable<Book>> GetBooksFilteredAsync(Expression<Func<Book, bool>> expression);
     Task<IEnumerable<Book>> GetRangeBookByIdAsync(IEnumerable<int> bookIds);
+    Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorIds, int start, int count);
 }
