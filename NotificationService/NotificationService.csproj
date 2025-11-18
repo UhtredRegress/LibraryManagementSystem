@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-LMS.NotificationService-2b7e12cb-c713-4956-9109-aacd3e91d161</UserSecretsId>
+        <RootNamespace>LMS.NotificationService</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Google.Protobuf" Version="3.32.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.72.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MailKit" Version="4.13.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
+        <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RabbitMQEventBus\RabbitMQEventBus.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="Protos\BookBorrowService.proto" GrpcServices="Client"></Protobuf>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package Library.Grpc;
+
+message FindSuccessfullyPurchaseEBookRequest {
+  int32 user_id = 1;
+  int32 book_id = 2;
+}
+
+message FindSuccessfullyPurchaseEbookResponse {
+  bool result = 1;
+  string message = 2;
+}
+
+// gRPC service
+service PurchaseGrpcAPI {
+  rpc FindSuccessfullyPurchaseEbook(FindSuccessfullyPurchaseEBookRequest) returns (FindSuccessfullyPurchaseEbookResponse);
+}
+

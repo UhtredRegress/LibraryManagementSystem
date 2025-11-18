@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.33.0-rc2" />
+      <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
+      <PackageReference Include="Grpc.Tools" Version="2.72.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="MediatR" Version="13.0.0" />
+      <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BorrowService.Infrastructure\BorrowService.Infrastructure.csproj" />
+      <ProjectReference Include="..\PurchaseService.Infrastructure\PurchaseService.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared\Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\Shared\Protos\PurchaseBookGrpc.proto" GrpcServices="Server" />
+    </ItemGroup>
+
+</Project>
