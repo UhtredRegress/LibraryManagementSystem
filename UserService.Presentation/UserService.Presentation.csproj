@@ -7,7 +7,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
       <UserSecretsId>97bf1dde-d29d-46a2-95fb-c6234fb12efc</UserSecretsId>
       <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-      <RootNamespace>LMS.UserService.Presentation</RootNamespace>
   </PropertyGroup>
 
     <ItemGroup>

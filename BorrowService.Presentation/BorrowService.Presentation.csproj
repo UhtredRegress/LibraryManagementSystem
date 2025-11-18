@@ -5,7 +5,6 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
       <UserSecretsId>88e0ee2b-bcbb-4984-897e-add2f4a4df7b</UserSecretsId>
-      <RootNamespace>LMS.BorrowService.Presentation</RootNamespace>
   </PropertyGroup>
 
     <ItemGroup>

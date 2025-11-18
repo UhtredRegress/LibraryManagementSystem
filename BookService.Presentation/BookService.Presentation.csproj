@@ -7,7 +7,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
       <UserSecretsId>f0504ad4-f2f4-435d-9d18-86be101867b3</UserSecretsId>
-      <RootNamespace>LMS.BookService.Presentation</RootNamespace>
   </PropertyGroup>
 
     <ItemGroup>
