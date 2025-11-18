@@ -1,0 +1,22 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+
+namespace BookService.Presentation.Authorization;
+
+public class NumericRoleHandler : AuthorizationHandler<NumericRoleRequirement>
+{
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        NumericRoleRequirement requirement)
+    {
+        var roleClaim = context.User.FindFirst(ClaimTypes.Role)?.Value;
+        if (roleClaim != null && int.TryParse(roleClaim, out int roleValue))
+        {
+            if ((roleValue & requirement.RoleRequirement) != 0)
+            {
+                context.Succeed(requirement);
+            }
+        }
+        
+        return Task.CompletedTask;
+    }
+}

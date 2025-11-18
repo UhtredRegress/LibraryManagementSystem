@@ -7,45 +7,71 @@ using RabbitMQ.Client.Events;
 
 namespace RabbitMQEventBus;
 
-public class RabbitMQEventBus : IEventBus
+public class RabbitMQEventBus : IEventBus, IDisposable
 {
-    private readonly IConnection _connection;
-    private readonly IChannel _channel;
-    private readonly string _exchangeName = "event_bus";
+    private IConnection _connection;
+    private IChannel _channel;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public RabbitMQEventBus(IConnection connection, IChannel channel, IServiceScopeFactory serviceScopeFactory)
+    public RabbitMQEventBus( IServiceScopeFactory serviceScopeFactory)
     {
-        _connection = connection;
-        _channel = channel;
         _serviceScopeFactory = serviceScopeFactory;
+    }
+
+    public async Task CreateConnection()
+    {
+        var connectionFactory = new ConnectionFactory()
+        {
+            HostName = "localhost",
+            Port = 5672,
+            UserName = "guest",
+        };
+        _connection = await connectionFactory.CreateConnectionAsync();
+    }
+
+    public async Task CreateChannel()
+    {
+        if (_connection is null)
+        {
+            await CreateConnection();
+        }
+
+        _channel = await _connection.CreateChannelAsync();
     }
 
     public async Task PublishAsync(IntegrationEvent @event)
     {
+        if (_connection is null)
+        {
+            await CreateConnection();
+        }
         using var _channel = await _connection.CreateChannelAsync();
-        await _channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Direct, durable: true);
         var eventName = @event.GetType().Name;
+        await _channel.ExchangeDeclareAsync(eventName, ExchangeType.Fanout, durable: true);
         var message = JsonSerializer.Serialize((object)@event, @event.GetType());
         var body = Encoding.UTF8.GetBytes(message);
         
         await _channel.BasicPublishAsync(
-            exchange: _exchangeName,
-            routingKey: eventName,
+            exchange: eventName,
+            routingKey: "",
             mandatory: false,
             body: body);
     }
     
 
-    public async Task SubscribeAsync<T, TH>(string queueName) where T : IntegrationEvent where TH : IIntegrationEventHandler<T>
+    public async Task SubscribeAsync<T, TH>() where T : IntegrationEvent where TH : IIntegrationEventHandler<T>
     {
-        
-        await _channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Direct, durable: true);
+        if (_channel is null)
+        {
+            await CreateChannel();
+        }
+        var queueName = typeof(TH).Name;
         var eventName = typeof(T).Name;
+        await _channel.ExchangeDeclareAsync(eventName, ExchangeType.Fanout, durable: true);
         
         await _channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false);
         
-        await _channel.QueueBindAsync(queue: queueName, exchange: _exchangeName, routingKey: eventName);
+        await _channel.QueueBindAsync(queue: queueName, exchange: eventName, routingKey: eventName);
         
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (ch, ea) =>
@@ -64,5 +90,11 @@ public class RabbitMQEventBus : IEventBus
         };
         
         await _channel.BasicConsumeAsync(queue: queueName, autoAck: false, consumer: consumer);
+    }
+
+    public void Dispose()
+    {
+        _connection?.Dispose();
+        _channel?.Dispose();
     }
 }
