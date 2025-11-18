@@ -1,65 +1,80 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using LMS.Bussiness;
 using MediatR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using UserService.Domain.Model;
+using Microsoft.Extensions.Logging;
+using Shared.DTOs;
 using UserService.Infrastructure.Interface;
 using Shared.Exception;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
+
 
 namespace UserService.Application.Queries;
 
-public record UserLoginQuery(string Username, string Password) : IRequest<string>;
+public record UserLoginQuery(string Username, string Password) : IRequest<LoginReponseDTO>;
 
-public class UserLoginQueryHandler : IRequestHandler<UserLoginQuery, string>
+public class UserLoginQueryHandler : IRequestHandler<UserLoginQuery, LoginReponseDTO>
 {
     private IConfiguration  _configuration;
     private readonly IUserRepository _userRepository;
+    private readonly ILogger<UserLoginQueryHandler> _logger;
 
-    public UserLoginQueryHandler(IUserRepository userRepository, IConfiguration configuration)
+    public UserLoginQueryHandler(IUserRepository userRepository, IConfiguration configuration, ILogger<UserLoginQueryHandler> logger)
     {
         _userRepository = userRepository;
         _configuration = configuration;
+        _logger = logger;
     }
 
 
-    public async Task<string> Handle(UserLoginQuery request, CancellationToken cancellationToken)
+    public async Task<LoginReponseDTO> Handle(UserLoginQuery request, CancellationToken cancellationToken)
     {
         var foundUser = await _userRepository.GetUserByUsernameAsync(request.Username);
         if (foundUser.Password != request.Password)
         {
             throw new UnauthenticationUserException("Invalid username or password");
         }
-        
-        return GenerateJwtToken(foundUser);
-    }
 
-    private string GenerateJwtToken(User user)
-    {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var credential = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
+        if (string.IsNullOrEmpty(_configuration["Jwt:Key"]))
         {
-            new Claim(JwtRegisteredClaimNames.Name, user.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.PhoneNumber, user.PhoneNumber),
-            new Claim(JwtRegisteredClaimNames.Address, user.Address),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim("role", user.RoleId.ToString()),
-            new Claim("status", user.Status.ToString()),
+            _logger.LogInformation("Key for sign jwt is not available in the configuration throwing exception");
+            throw new InvalidOperationException("Jwt key is not available in the configuration");
+        }
+        
+        if (string.IsNullOrEmpty(_configuration["Jwt:Audience"]))
+        {
+            _logger.LogInformation("Jwt Audience is not available in the configuration throwing exception");
+            throw new InvalidOperationException("Jwt audience is not available in the configuration");
+        }
+
+        if (string.IsNullOrEmpty(_configuration["Jwt:Issuer"]))
+        {
+            _logger.LogInformation("Jwt issuer is not available in the configuration throwing exception");
+            throw new InvalidOperationException("Jwt issuer is not available in the configuration");
+        }
+        
+        
+        string accessToken = JwtTokenIssueHelper.GenerateJwtToken(foundUser, _configuration["Jwt:Key"], _configuration["Jwt:Issuer"], _configuration["Jwt:Audience"] );
+        
+        string refreshToken = Guid.NewGuid().ToString();
+        
+        var result = new LoginReponseDTO()
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            ExpiresIn = 3600,
+            TokenType = "Bearer"
         };
 
-        var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
-            signingCredentials: credential
-        );
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        using var sha256 = SHA256.Create();
+        byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+        refreshToken = Convert.ToHexString(hash);
+        
+        foundUser.UpdateTokenHashed(refreshToken);
+        await _userRepository.UpdateUserAsync(foundUser);
+        
+        
+        return result; 
     }
+    
 }

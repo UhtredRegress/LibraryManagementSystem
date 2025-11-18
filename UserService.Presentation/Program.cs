@@ -1,5 +1,6 @@
 using System.Text;
 using FluentValidation;
+using LMS.Bussiness.Service;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -59,6 +60,7 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(BookService.Applicat
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddTransient<ITokenService, TokenService>();
 
 // Configure Redis distributed cache
 builder.Services.AddStackExchangeRedisCache(options =>

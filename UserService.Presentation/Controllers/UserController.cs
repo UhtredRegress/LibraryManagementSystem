@@ -1,8 +1,9 @@
+
 using System.Security.Claims;
+using LMS.Bussiness.Service;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using UserService.Application.Commands;
 using UserService.Application.Queries;
 using UserService.Domain.Model;
@@ -16,10 +17,12 @@ namespace UserService.Presentation.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ITokenService _tokenService;
 
-    public UserController(IMediator mediator)
+    public UserController(IMediator mediator, ITokenService tokenService)
     {
         _mediator = mediator;
+        _tokenService = tokenService;
     }
     [Authorize(Policy = "AdminRoleRequirement")]
     [HttpPost]
@@ -66,7 +69,8 @@ public class UserController : ControllerBase
     
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDTO userLogin)
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> Login([FromForm] LoginDTO userLogin)
     {
         try
         {
@@ -82,6 +86,27 @@ public class UserController : ControllerBase
             return Unauthorized(new { Errors = ex.Message });
         }
     }
+    
+    [HttpGet("token/refresh")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> RefreshToken(int userId, string refreshToken)
+    {
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return BadRequest(new { Error = "Refresh token is empty" });
+        }
+
+        try
+        {
+            var token = await _tokenService.RefreshAccessTokenAsync(userId, refreshToken);
+            return Ok(new { AccessToken = token });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Errors = ex.Message });
+        }
+    }
+    
     
     [Authorize]
     [HttpPost("email-confirm")]

@@ -36,6 +36,9 @@ public class User
     public DateTime ModifiedAt { get; set; }
     
     public Status Status { get; private set; }
+    
+    public string? HashedToken { get; private set; }
+    public DateTime? TokenExpiredDateTime { get; private set; }
 
     public User() { }
 
@@ -74,5 +77,11 @@ public class User
         Status = Status.Active;
         ModifiedAt = DateTime.UtcNow;
         return this;
+    }
+
+    public void UpdateTokenHashed(string hashToken)
+    {
+        HashedToken = hashToken;
+        TokenExpiredDateTime = DateTime.UtcNow.AddHours(1);
     }
 }
