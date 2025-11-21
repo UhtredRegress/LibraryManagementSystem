@@ -77,6 +77,9 @@ public class Book
         {
             book.BookCategories.Add(new BookCategory(book, category));
         }
+        book.CreatedAt = DateTime.UtcNow;
+        book.ModifiedAt = DateTime.UtcNow;
+        
         return book;
     }
 

@@ -1,3 +1,4 @@
+using NotificationService.EventHandler;
 using RabbitMQEventBus;
 
 namespace NotificationService;
@@ -18,6 +19,8 @@ public class SubscribeHandlerService:IHostedService
         _logger.LogInformation("SubscribeHandlerService is starting.");
         await _eventBus.SubscribeAsync<BorrowHistoryCreatedIntegratedEvent, BorrowHistoryNotificationHandler>();
         await _eventBus.SubscribeAsync<ConfirmEmailIntegratedEvent, ConfirmEmailIntegratedEventHandler>();
+        await _eventBus.SubscribeAsync<NewBookCreatedIntegratedEvent, NewBookAddedEventHandler>();
+        _logger.LogInformation("SubscribeHandlerService finished successfully.");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

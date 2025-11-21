@@ -120,6 +120,7 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(AssemblyMarker));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddHostedService<PushEventWorker>();
 
 var app = builder.Build();
 

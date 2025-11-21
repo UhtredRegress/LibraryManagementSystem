@@ -4,6 +4,7 @@ using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using RabbitMQEventBus;
 using Shared.Enum;
 using Shared.Exception;
 
@@ -16,15 +17,17 @@ public class BookService : IBookService
     private readonly ILogger<BookService> _logger;
     private readonly IAuthorRepository _authorRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IEventBus _eventBus;
 
     public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger,
-        IAuthorRepository authorRepository, ICategoryRepository categoryRepository)
+        IAuthorRepository authorRepository, ICategoryRepository categoryRepository, IEventBus eventBus)
     {
         _bookRepository = bookRepository;
         _minioService = minioService;
         _logger = logger;
         _authorRepository = authorRepository;
         _categoryRepository = categoryRepository;
+        _eventBus = eventBus;
     }
 
     public async Task<Book> AddBookAsync(BookAddDTO bookAddDTO)
@@ -99,7 +102,13 @@ public class BookService : IBookService
             savedBook.UpdateFileAddress(fileName);
             return await _bookRepository.UpdateBookAsync(newBook);
         }
-
+        
+        _logger.LogInformation("Persistence data successfully start emit integrated event");
+        var integratedEvent = new NewBookCreatedIntegratedEvent {Title = savedBook.Title, Author = string.Join(", ", savedBook.Authors.Select(c => c.Name)), Category = string.Join(", ", savedBook.BookCategories.Select(c => c.Category?.Name))};
+        //await _eventBus.PublishAsync(integratedEvent);
+        
+        QueueService.Queue.Enqueue(integratedEvent); 
+        
         return savedBook;
     }
 

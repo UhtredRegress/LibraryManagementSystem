@@ -71,6 +71,18 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 builder.Services.AddScoped<IEmailTokenService, EmailTokenService>();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()   // allow all origins
+            .AllowAnyMethod()   // allow all HTTP methods
+            .AllowAnyHeader();  // allow all headers
+    });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -99,6 +111,8 @@ builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
 builder.Services.AddSingleton<IEventBus, RabbitMQEventBus.RabbitMQEventBus>();
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 app.MapOpenApi();

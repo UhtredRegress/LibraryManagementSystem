@@ -64,3 +64,4 @@ nunit-*.xml
 /UserService/LMS.UserService.Presentation/LMS.UserService.Presentation.csproj.user
 /dev-secrets
 /LMS.slnLaunch.user
+**.DS_Store

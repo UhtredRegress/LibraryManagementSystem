@@ -13,7 +13,6 @@ using BorrowService.Application.Behavior;
 using BorrowService.Infrastructure.IRepository;
 using BorrowService.Presentation.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using RabbitMQ.Client;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);

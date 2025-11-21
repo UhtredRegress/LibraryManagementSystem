@@ -4,6 +4,8 @@
     "LMS.NotificationService": {
       "commandName": "Project",
       "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5070",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
