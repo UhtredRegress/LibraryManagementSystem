@@ -1,5 +1,7 @@
+using System.Net.Mime;
 using BookService.Infrastructure.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel.Args;
@@ -10,6 +12,7 @@ public class MinioService : IMinioService
 {
     private readonly IMinioClient _minioClient;
     private readonly IOptions<MinioSettings> _minioSettings;
+    
 
     public MinioService(IOptions<MinioSettings> options)
     {
@@ -58,4 +61,6 @@ public class MinioService : IMinioService
 
         return await _minioClient.PresignedGetObjectAsync(getPresignedObjectUrlArgs);
     }
+
+  
 }

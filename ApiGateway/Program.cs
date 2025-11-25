@@ -22,6 +22,19 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(5000);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
+
 var app = builder.Build();
 
 // Enable Swagger UI for Ocelot
@@ -30,7 +43,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCors("AllowAngular");
 app.UseMiddleware<MetricCollectorMiddleware>();
-await app.UseOcelot();
 
+await app.UseOcelot();
 app.Run();

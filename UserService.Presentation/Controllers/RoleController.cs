@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Commands;
 using Shared.DTOs;
 using Shared.Exception;
+using UserService.Application.Queries;
 
 namespace UserService.Presentation.Controllers;
 
@@ -13,13 +14,15 @@ namespace UserService.Presentation.Controllers;
 public class RoleController:ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<RoleController> _logger;
 
-    public RoleController(IMediator mediator)
+    public RoleController(IMediator mediator, ILogger<RoleController> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> AddRole([FromBody]RoleDTO roleDTO)
     {
         var command = new AddRoleCommand(roleDTO);
@@ -73,6 +76,21 @@ public class RoleController:ControllerBase
         catch (Exception ex)
         {
             return BadRequest(new { Error = ex.Message });
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllRoles()
+    {
+        try
+        {
+            var result = await _mediator.Send(new AllRolesQuery());
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, new { Error = "There is error while processing your request" });
         }
     }
     

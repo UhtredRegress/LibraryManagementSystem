@@ -6,7 +6,7 @@ namespace BookService.Application.IService;
 public interface IBookService
 {
     Task<Book> AddBookAsync(BookAddDTO bookAddDTO);
-    Task<BookResultDTO> UpdateBookAsync(int id, BookUpdateInformationDTO book);
+    Task<BookResultDTO> UpdateBookAsync(int id, BookAddDTO book);
     Task<Book> DeleteBookAsync(int id);
     Task<IEnumerable<Book>> GetBooksByPublishedDate(DateTime startDate, DateTime endDate);
     Task<IEnumerable<Book>> GetBooksByTitle(string title);

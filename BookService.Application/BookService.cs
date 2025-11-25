@@ -17,22 +17,29 @@ public class BookService : IBookService
     private readonly ILogger<BookService> _logger;
     private readonly IAuthorRepository _authorRepository;
     private readonly ICategoryRepository _categoryRepository;
-    private readonly IEventBus _eventBus;
+    private readonly ICoverMinioService _coverMinioService;
+    
+    private readonly int _maxFileSizeBytes = 5 * 1024 * 1024;
+    private readonly string[] _allowedExtensions = new [] {".jpg", ".jpeg", ".png"};
 
     public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger,
-        IAuthorRepository authorRepository, ICategoryRepository categoryRepository, IEventBus eventBus)
+        IAuthorRepository authorRepository, ICategoryRepository categoryRepository, ICoverMinioService coverMinioService)
     {
         _bookRepository = bookRepository;
         _minioService = minioService;
         _logger = logger;
         _authorRepository = authorRepository;
         _categoryRepository = categoryRepository;
-        _eventBus = eventBus;
+        _coverMinioService = coverMinioService;
     }
 
-    public async Task<Book> AddBookAsync(BookAddDTO bookAddDTO)
+    private void ValidateBookDto(BookAddDTO bookAddDTO)
     {
-        _logger.LogInformation("Start handling add new book");
+        ArgumentNullException.ThrowIfNull(bookAddDTO.Author);
+        ArgumentNullException.ThrowIfNull(bookAddDTO.Category);
+        ArgumentNullException.ThrowIfNull(bookAddDTO.Description);
+        ArgumentException.ThrowIfNullOrEmpty(bookAddDTO.Title);
+        
         var typeCount = Enum.GetNames(typeof(BookType)).Length;
         var maximumType = 1 << typeCount;
         if (bookAddDTO.Title == null)
@@ -64,8 +71,22 @@ public class BookService : IBookService
             {
                 throw new InvalidDataException("Ebook file is empty to create");
             }
+            
+            var extension = Path.GetExtension(bookAddDTO.File.FileName).ToLowerInvariant();
+            if (!extension.Contains(".pdf"))
+            {
+                throw new ArgumentException(
+                    $"Invalid file extension: {extension}. Allowed: .pdf");
+            }
         }
+    }
 
+    public async Task<Book> AddBookAsync(BookAddDTO bookAddDTO)
+    {
+        _logger.LogInformation("Start handling add new book");
+        
+        ValidateBookDto(bookAddDTO);
+        
         _logger.LogInformation("Retrieve all the author of the book in the request");
         var foundAuthor = await _authorRepository.GetRangeFilterAsync(a => bookAddDTO.Author.Contains(a.Id));
 
@@ -91,6 +112,10 @@ public class BookService : IBookService
 
         var savedBook = await _bookRepository.AddBookAsync(newBook);
 
+        _logger.LogInformation("Store cover image");
+        var imageAddress = await _coverMinioService.UploadBookCoverAsync(savedBook.Id, bookAddDTO.Cover);
+        savedBook.UpdateCoverAddress(imageAddress);
+        
         if ((bookAddDTO.Type & (int)BookType.Ebook) != 0)
         {
             _logger.LogInformation("Started stored ebook into storage");
@@ -100,22 +125,23 @@ public class BookService : IBookService
             
             _logger.LogInformation("Started update file address {FileName} into database", fileName);
             savedBook.UpdateFileAddress(fileName);
-            return await _bookRepository.UpdateBookAsync(newBook);
         }
+        
+        await _bookRepository.UpdateBookAsync(savedBook);
         
         _logger.LogInformation("Persistence data successfully start emit integrated event");
         var integratedEvent = new NewBookCreatedIntegratedEvent {Title = savedBook.Title, Author = string.Join(", ", savedBook.Authors.Select(c => c.Name)), Category = string.Join(", ", savedBook.BookCategories.Select(c => c.Category?.Name))};
-        //await _eventBus.PublishAsync(integratedEvent);
-        
         QueueService.Queue.Enqueue(integratedEvent); 
         
         return savedBook;
     }
 
-    public async Task<BookResultDTO> UpdateBookAsync(int id, BookUpdateInformationDTO book)
+    public async Task<BookResultDTO> UpdateBookAsync(int id, BookAddDTO book)
     {
         _logger.LogInformation("Started handle request to update the book id {BookId}", id);
-
+        
+        ValidateBookDto(book);
+        
         _logger.LogInformation("Find book id {BookId} in the database", id);
         var foundBook = await _bookRepository.GetBookByIdAsync(id);
 
@@ -136,11 +162,13 @@ public class BookService : IBookService
         
         _logger.LogInformation("Retrieve all the category of the book in the request"); 
         var foundCategories = await _categoryRepository.GetRangeFilterAsync(a => book.Category.Contains(a.Id));
+        
         if (foundCategories.Count() < book.Category.Count() )
         {
             _logger.LogInformation("There are categories in the request that not exist in database");
             throw new InvalidDataException("There are author does not exist in database");
         }
+        
 
         _logger.LogInformation("Started update information in the database");
         foundBook.UpdateInformationBook(book.Title, book.Publisher, book.Description, book.PublishDate, foundAuthor, categories: foundCategories );

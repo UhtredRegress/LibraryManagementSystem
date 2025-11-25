@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Minio;
 using RabbitMQEventBus;
 using StackExchange.Redis;
 
@@ -121,6 +122,16 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddHostedService<PushEventWorker>();
+builder.Services.AddSingleton<IMinioClient>(sp =>
+{
+    var config = builder.Configuration.GetSection("CoverMinio");
+    return new MinioClient()
+        .WithEndpoint(config["Endpoint"])
+        .WithCredentials(config["AccessKey"], config["SecretKey"])
+        .WithSSL(Convert.ToBoolean(config["SSL"]))
+        .Build();
+});
+builder.Services.AddScoped<ICoverMinioService, CoverMinioService>();
 
 var app = builder.Build();
 

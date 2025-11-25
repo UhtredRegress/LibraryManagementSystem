@@ -26,6 +26,7 @@ public class Book
     public int Type { get; private set; }
     public string? FileAddress { get; private set; }
     public int? Stock { get; private set; }
+    public string CoverAddress { get; private set; }
     
     public Book() {}
 
@@ -68,6 +69,8 @@ public class Book
         book.Stock = stock;
         book.Type = type;
         book.Stock = stock;
+        book.CoverAddress = "";
+
         foreach (var author in authors)
         {
             book.Authors.Add(author);
@@ -91,6 +94,11 @@ public class Book
     public void BookReturned()
     {
         Stock++;
+    }
+
+    public void UpdateCoverAddress(string address)
+    {
+        CoverAddress = address;
     }
 
     public void UpdateFileAddress(string fileAddress)

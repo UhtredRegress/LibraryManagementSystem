@@ -5,6 +5,7 @@ namespace BookService.Application;
 
 public class BookAddDTO
 {
+    public IFormFile Cover { get; set; }
     public IFormFile? File { get; set; }
     public string Title { get; set; }
     public IEnumerable<int> Author { get; set; }

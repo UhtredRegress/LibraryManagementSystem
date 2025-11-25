@@ -14,6 +14,7 @@ namespace BookService.Presentation.Controllers;
 public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
+    
 
     public BookController(IBookService bookService)
     {
@@ -40,7 +41,7 @@ public class BookController : ControllerBase
     }
 
     [HttpPut("/update/{id}")]
-    public async Task<IActionResult> UpdateBook([FromRoute]int id,[FromForm] BookUpdateInformationDTO book)
+    public async Task<IActionResult> UpdateBook([FromRoute]int id,[FromForm] BookAddDTO book)
     {
         try
         {
@@ -145,4 +146,6 @@ public class BookController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    
 }

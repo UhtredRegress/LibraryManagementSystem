@@ -6,7 +6,7 @@
       "DownstreamHostAndPorts": [
         { "Host": "localhost", "Port": 5078 }
       ],
-      "UpstreamPathTemplate": "/users/{everything}",
+      "UpstreamPathTemplate": "/api/users/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
@@ -15,9 +15,9 @@
       "DownstreamHostAndPorts": [
         { "Host": "localhost", "Port": 5078 }
       ],
-      "UpstreamPathTemplate": "/roles/{everything}",
+      "UpstreamPathTemplate": "/api/roles/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST" ]
-    },
+    },  
     {
       "DownstreamPathTemplate": "/api/books/{everything}",
       "DownstreamScheme": "http",
