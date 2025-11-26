@@ -8,7 +8,7 @@ namespace BookService.Presentation.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("categories")]
+[Route("api/categories")]
 public class CategoryController:ControllerBase
 {
     private readonly ILogger<CategoryController> _logger;

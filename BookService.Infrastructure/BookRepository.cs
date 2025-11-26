@@ -54,7 +54,7 @@ public class BookRepository : IBookRepository
 
     public async Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorIds, int start, int number)
     {
-        return  await _context.Books.AsNoTracking()
+        return await _context.Books.AsNoTracking()
             .Where(book => book.Authors.Any(author => author.Id == authorIds))
             .Include(book => book.BookCategories).ThenInclude(bookCategory => bookCategory.Category)
             .Include(book => book.Authors)
@@ -62,6 +62,37 @@ public class BookRepository : IBookRepository
             .Skip(start)
             .Take(number)
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Book>> GetBooksAsync(int page, int pageSize, int? type, ICollection<int>? authorsId,
+        ICollection<int>? categoriesId,
+        int? yearPublishedStart, int? yearPublishedEnd)
+    {
+        var query = _context.Books.AsNoTracking();
+        if (type != null)
+        {
+            query = query.Where(book => ((int)book.Type & type) != 0);
+        }
+
+        if (authorsId != null)
+        {
+            query = query.Where(x => x.Authors.Any(a => authorsId.Contains(a.Id)));
+        }
+
+        if (categoriesId != null)
+        {
+            query = query.Where(x => x.Authors.Any(a => categoriesId.Contains(a.Id)));
+        }
+
+        if (yearPublishedStart != null && yearPublishedEnd != null)
+        {
+            query = query.Where(x =>
+                x.PublishDate.Value.Year >= yearPublishedStart && x.PublishDate.Value.Year <= yearPublishedEnd);
+        }
+
+        return await query.Include(book => book.BookCategories).ThenInclude(cate => cate.Category)
+            .Include(book => book.Authors)
+            .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
     public async Task<IEnumerable<Book>> UpdateRangeBookAsync(IEnumerable<Book> books)

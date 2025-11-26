@@ -15,24 +15,19 @@ public class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
     
-
     public BookController(IBookService bookService)
     {
         _bookService = bookService;
     }
+    
 
-    [HttpPost]
-    public async Task<IActionResult> AddBook(BookAddDTO BookDto)
+    [HttpPost("create")]
+    public async Task<IActionResult> AddBook([FromForm] BookAddDTO BookDto)
     {
         try
         {
             var addedBook = await _bookService.AddBookAsync(BookDto);
-
-            var resultAddDTO = new BookResultDTO(addedBook.Id, addedBook.Title, addedBook.Authors, addedBook.BookCategories,
-                addedBook.Publisher, stock: addedBook.Stock, fileAddress: addedBook.FileAddress,
-                type: addedBook.Type);
-
-            return Ok(resultAddDTO);
+            return Ok(addedBook);
         }
         catch (Exception e)
         {
@@ -40,8 +35,8 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpPut("/update/{id}")]
-    public async Task<IActionResult> UpdateBook([FromRoute]int id,[FromForm] BookAddDTO book)
+    [HttpPut("update/{id}")]
+    public async Task<IActionResult> UpdateBook([FromRoute]int id,[FromForm] BookUpdateInformationDTO book)
     {
         try
         {
@@ -58,7 +53,7 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpDelete("/delete/{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteBook(int id)
     {
         try
@@ -76,7 +71,7 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpGet("/filter/published")]
+    [HttpGet("filter/published")]
     public async Task<IActionResult> GetPublishedDateBooks(DateTime startDate, DateTime endDate)
     {
         try
@@ -94,7 +89,7 @@ public class BookController : ControllerBase
         }
     }
 
-    [HttpGet("/filter/title")]
+    [HttpGet("filter/title")]
     public async Task<IActionResult> GetBooksByTitle(string title)
     {
         try

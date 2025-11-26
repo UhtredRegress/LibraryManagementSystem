@@ -17,26 +17,6 @@ public class CoverMinioService : ICoverMinioService
     }
     public async Task<string> UploadBookCoverAsync(int id, IFormFile file)
     {
-        if (file == null || file.Length == 0)
-        {
-            throw new ArgumentException("No file provided");
-        }
-
-        // Check file size
-        if (file.Length > _maxFileSizeBytes)
-        {
-            throw new ArgumentException(
-                $"File size ({file.Length / 1024 / 1024}MB) exceeds maximum (5MB)");
-        }
-
-        // Check file extension
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!_allowedExtensions.Contains(extension))
-        {
-            throw new ArgumentException(
-                $"Invalid file extension: {extension}. Allowed: {string.Join(", ", _allowedExtensions)}");
-        }
-        
         string objectName = id + "_cover_" + DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
         // Ensure bucket exists
         bool found = await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(_coverBucketName));

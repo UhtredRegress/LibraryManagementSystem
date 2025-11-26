@@ -9,7 +9,7 @@ namespace BookService.Presentation.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("authors")]
+[Route("api/authors")]
 public class AuthorController:ControllerBase
 {
     private readonly IMediator _mediator;

@@ -14,4 +14,8 @@ public interface IBookRepository
     Task<IEnumerable<Book>> GetBooksFilteredAsync(Expression<Func<Book, bool>> expression);
     Task<IEnumerable<Book>> GetRangeBookByIdAsync(IEnumerable<int> bookIds);
     Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorIds, int start, int count);
+
+    Task<IEnumerable<Book>> GetBooksAsync(int page, int pageSize, int? type, ICollection<int>? authorsId,
+        ICollection<int>? categoriesId,
+        int? yearPublishedStart, int? yearPublishedEnd);
 }

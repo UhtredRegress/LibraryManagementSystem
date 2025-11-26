@@ -1,8 +1,10 @@
+using BookService.Application.DTO;
 using BookService.Application.IService;
 using BookService.Domain.Model;
 using BookService.Infrastructure;
 using BookService.Infrastructure.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQEventBus;
 using Shared.Enum;
@@ -18,12 +20,14 @@ public class BookService : IBookService
     private readonly IAuthorRepository _authorRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ICoverMinioService _coverMinioService;
+    private readonly IConfiguration _configuration;
     
     private readonly int _maxFileSizeBytes = 5 * 1024 * 1024;
     private readonly string[] _allowedExtensions = new [] {".jpg", ".jpeg", ".png"};
 
     public BookService(IBookRepository bookRepository, IMinioService minioService, ILogger<BookService> logger,
-        IAuthorRepository authorRepository, ICategoryRepository categoryRepository, ICoverMinioService coverMinioService)
+        IAuthorRepository authorRepository, ICategoryRepository categoryRepository, ICoverMinioService coverMinioService,
+        IConfiguration configuration)
     {
         _bookRepository = bookRepository;
         _minioService = minioService;
@@ -31,6 +35,7 @@ public class BookService : IBookService
         _authorRepository = authorRepository;
         _categoryRepository = categoryRepository;
         _coverMinioService = coverMinioService;
+        _configuration = configuration;
     }
 
     private void ValidateBookDto(BookAddDTO bookAddDTO)
@@ -65,6 +70,25 @@ public class BookService : IBookService
             }
         }
 
+        if (bookAddDTO.Cover == null || bookAddDTO.Cover.Length == 0)
+        {
+            throw new ArgumentException("Cover image is required");
+        } 
+        
+        if (bookAddDTO.Cover.Length > _maxFileSizeBytes)
+        {
+            throw new ArgumentException(
+                $"File size ({bookAddDTO.Cover.Length / 1024 / 1024}MB) exceeds maximum (5MB)");
+        }
+        
+        var extension = Path.GetExtension(bookAddDTO.Cover.FileName).ToLowerInvariant();
+        if (!_allowedExtensions.Contains(extension))
+        {
+            throw new ArgumentException(
+                $"Invalid file extension: {extension}. Allowed: {string.Join(", ", _allowedExtensions)}");
+        }
+        
+        
         if ((bookAddDTO.Type & (int)BookType.Ebook) != 0)
         {
             if (bookAddDTO.File == null || bookAddDTO.File.Length <= 0)
@@ -72,8 +96,8 @@ public class BookService : IBookService
                 throw new InvalidDataException("Ebook file is empty to create");
             }
             
-            var extension = Path.GetExtension(bookAddDTO.File.FileName).ToLowerInvariant();
-            if (!extension.Contains(".pdf"))
+            var extensionType = Path.GetExtension(bookAddDTO.File.FileName).ToLowerInvariant();
+            if (!extensionType.Contains(".pdf"))
             {
                 throw new ArgumentException(
                     $"Invalid file extension: {extension}. Allowed: .pdf");
@@ -81,7 +105,7 @@ public class BookService : IBookService
         }
     }
 
-    public async Task<Book> AddBookAsync(BookAddDTO bookAddDTO)
+    public async Task<BookInfoResultDTO> AddBookAsync(BookAddDTO bookAddDTO)
     {
         _logger.LogInformation("Start handling add new book");
         
@@ -114,7 +138,7 @@ public class BookService : IBookService
 
         _logger.LogInformation("Store cover image");
         var imageAddress = await _coverMinioService.UploadBookCoverAsync(savedBook.Id, bookAddDTO.Cover);
-        savedBook.UpdateCoverAddress(imageAddress);
+        savedBook.UpdateCoverAddress($"/cover/{imageAddress}");
         
         if ((bookAddDTO.Type & (int)BookType.Ebook) != 0)
         {
@@ -133,15 +157,33 @@ public class BookService : IBookService
         var integratedEvent = new NewBookCreatedIntegratedEvent {Title = savedBook.Title, Author = string.Join(", ", savedBook.Authors.Select(c => c.Name)), Category = string.Join(", ", savedBook.BookCategories.Select(c => c.Category?.Name))};
         QueueService.Queue.Enqueue(integratedEvent); 
         
-        return savedBook;
+        return new BookInfoResultDTO()
+        {
+            Id = savedBook.Id,
+            Title = savedBook.Title,
+            Author = savedBook.Authors.Select(x => new AuthorResponseDTO {Id = x.Id, Name = x.Name }),
+            Category = savedBook.BookCategories.Select(x => new CategoryDTO {Id = x.CategoryId, Name = x.Category.Name }),
+            Publisher = savedBook.Publisher,
+            Type = savedBook.Type,
+            Stock = savedBook.Stock,
+            CoverAddress = "http://" + _configuration["CoverMinio:Endpoint"] + savedBook.CoverAddress,
+        };
     }
 
-    public async Task<BookResultDTO> UpdateBookAsync(int id, BookAddDTO book)
+    public async Task<BookResultDTO> UpdateBookAsync(int id, BookUpdateInformationDTO book)
     {
         _logger.LogInformation("Started handle request to update the book id {BookId}", id);
-        
-        ValidateBookDto(book);
-        
+
+        if (book.Author == null || book.Author.Any() == false)
+        {
+            throw new ArgumentException("The author must not be null or empty");
+        }
+
+        if (book.Category == null || book.Category.Any() == false)
+        {
+            throw new ArgumentException("The category must not be null or empty");
+        }
+
         _logger.LogInformation("Find book id {BookId} in the database", id);
         var foundBook = await _bookRepository.GetBookByIdAsync(id);
 
@@ -274,5 +316,12 @@ public class BookService : IBookService
 
         return new BookResultDTO(foundBook.Id, foundBook.Title, foundBook.Authors, foundBook.BookCategories, foundBook.Publisher, foundBook.Type,
             foundBook.Stock, foundBook.FileAddress);
+    }
+
+    public async Task<IEnumerable<BookInfoResultDTO>> GetBooksAsync(int page, int pageSize, int? type, ICollection<int>? authorsId, ICollection<int>? categoriesId,
+        int? yearPublishedStart, int? yearPublishedEnd)
+    {
+        var result = await _bookRepository.GetBooksAsync(page, pageSize, type, authorsId, categoriesId, yearPublishedStart, yearPublishedEnd);
+        return result.Select(x => new BookInfoResultDTO(x.Id, x.Title, x.Authors, x.BookCategories, x.Publisher, x.Type, x.Stock, "http://" + _configuration["CoverMinio:Endpoint"] +x.CoverAddress));
     }
 }

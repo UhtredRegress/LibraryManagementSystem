@@ -8,7 +8,7 @@ namespace BookService.Presentation.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("ebooks")]
+[Route("api/ebooks")]
 public class EBookReadController : ControllerBase
 {
     private readonly ILogger<EBookReadController> _logger;
