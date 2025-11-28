@@ -11,7 +11,10 @@ using System.Text;
 using BorrowkService.Presentation.Authorization;
 using BorrowService.Application.Behavior;
 using BorrowService.Infrastructure.IRepository;
+using BorrowService.Presentation;
 using BorrowService.Presentation.Authorization;
+using Hangfire;
+using Hangfire.Redis.StackExchange;
 using Microsoft.AspNetCore.Authorization;
 using StackExchange.Redis;
 
@@ -107,7 +110,17 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return LazyConnection.Value;
 });
 
+var redisOptions = new RedisStorageOptions
+{
+    Prefix = "hangfire:"
+};
+
 builder.Services.AddSingleton<IAuthorizationHandler, NumericRoleHandler>();
+builder.Services.AddHostedService<OverdueCheckHostService>();
+builder.Services.AddHangfire(configuration => configuration
+    .UseRedisStorage("localhost:6379", redisOptions));
+
+builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -127,6 +140,13 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;  
     });
 }
+
+RecurringJob.AddOrUpdate(
+    "daily-check-overdue",            // job id
+    () => Console.WriteLine("Task running at 7 AM!"), // your task
+    "0 7 * * *"                 // CRON expression: every day at 07:00
+);
+
 
 app.UseAuthentication();
 app.UseAuthorization();

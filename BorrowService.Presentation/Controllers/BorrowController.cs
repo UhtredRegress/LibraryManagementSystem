@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using BorrowService.Application.Commands;
+using BorrowService.Application.Queries;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -62,8 +63,7 @@ public class BorrowController:ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
-    [Authorize]
+    
     [HttpPost("return")]
     public async Task<IActionResult> ReturnBook(IEnumerable<int> bookIds)
     {
@@ -106,6 +106,22 @@ public class BorrowController:ControllerBase
         catch (Exception ex)
         {
             return BadRequest(new {message = ex.Message});
+        }
+    }
+
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMyBorrowHistories(int page = 1, int pageSize = 20)
+    {
+        try
+        {
+            var userIdClaim = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var result = await _mediator.Send(new MyBorrowHistoriesQuery(userIdClaim, page, pageSize));
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            return StatusCode(500, "There was a problem with your request");
         }
     }
 }
